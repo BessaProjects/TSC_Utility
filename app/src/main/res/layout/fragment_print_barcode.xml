@@ -1,0 +1,157 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@color/color_bg"
+    android:orientation="vertical">
+
+    <TextView
+        style="@style/style_title"
+        android:text="Print parameter"/>
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="1dp"
+        android:background="@android:color/white"
+        android:orientation="vertical"
+        android:padding="10dp">
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal">
+
+            <TextView
+                style="@style/style_edittext_mediainfo_title"
+                android:text="Value" />
+
+            <EditText
+                android:id="@+id/print_barcode_value"
+                style="@style/style_edittext_mediainfo_title"
+                android:layout_marginLeft="5dp"
+                android:background="@drawable/img_bg_spinner_stroke_black"/>
+
+        </LinearLayout>
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="10dp"
+            android:orientation="horizontal">
+
+            <TextView
+                style="@style/style_edittext_mediainfo_title"
+                android:text="Print Type" />
+
+            <EditText
+                android:id="@+id/print_barcode_type"
+                style="@style/style_edittext_mediainfo_title"
+                android:layout_marginLeft="5dp"
+                android:background="@drawable/img_bg_spinner_stroke_black" />
+        </LinearLayout>
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="10dp"
+            android:orientation="horizontal">
+
+            <TextView
+                style="@style/style_edittext_mediainfo_title"
+                android:text="Media Size" />
+
+            <TextView
+                android:id="@+id/print_barcode_media_size"
+                style="@style/style_edittext_mediainfo_title"
+                android:layout_marginLeft="5dp"
+                android:background="@drawable/img_bg_spinner_stroke_black"/>
+
+        </LinearLayout>
+    </LinearLayout>
+
+    <TextView
+        style="@style/style_title"
+        android:layout_marginTop="15dp"
+        android:text="Media info"/>
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="1dp"
+        android:background="@android:color/white"
+        android:orientation="vertical">
+
+        <LinearLayout style="@style/style_info_parent">
+
+            <TextView
+                style="@style/style_info_content"
+                android:text="Paper Width" />
+
+            <TextView
+                android:id="@+id/print_barcode_paper_width"
+                style="@style/style_info_content"
+                android:text="Device" />
+
+        </LinearLayout>
+
+        <LinearLayout style="@style/style_info_parent">
+
+            <TextView
+                style="@style/style_info_content"
+                android:text="Paper Height" />
+
+            <TextView
+                android:id="@+id/print_barcode_paper_height"
+                style="@style/style_info_content"
+                android:text="Device" />
+
+        </LinearLayout>
+
+        <LinearLayout style="@style/style_info_parent">
+
+            <TextView
+                style="@style/style_info_content"
+                android:text="Sensor Type" />
+
+            <TextView
+                android:id="@+id/print_barcode_sensor_type"
+                style="@style/style_info_content"
+                android:text="Device" />
+
+        </LinearLayout>
+
+    </LinearLayout>
+
+    <RelativeLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent">
+
+        <RelativeLayout
+            android:id="@+id/print_barcode_action"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_alignParentBottom="true"
+            android:background="@android:color/white">
+
+            <LinearLayout
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_centerInParent="true"
+                android:orientation="horizontal"
+                android:padding="10dp">
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Print"
+                    android:textColor="@color/color_blue_btn_txt"
+                    android:textSize="20sp" />
+
+            </LinearLayout>
+        </RelativeLayout>
+
+    </RelativeLayout>
+
+
+</LinearLayout>

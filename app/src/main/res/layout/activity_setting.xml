@@ -1,0 +1,81 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:fresco="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical">
+
+    <include
+        layout="@layout/toolbar"/>
+
+    <ScrollView
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:layout_marginBottom="45dp">
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical">
+
+            <com.facebook.drawee.view.SimpleDraweeView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                fresco:actualImageResource="@drawable/app_logo"
+                fresco:actualImageScaleType="fitCenter"
+                fresco:fadeDuration="0"
+                fresco:viewAspectRatio="3.597"
+                android:layout_margin="15dp"/>
+
+            <com.facebook.drawee.view.SimpleDraweeView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                fresco:actualImageResource="@drawable/app_logo_slogan"
+                fresco:actualImageScaleType="fitCenter"
+                fresco:fadeDuration="0"
+                fresco:viewAspectRatio="16.1" />
+
+            <android.support.v7.widget.RecyclerView
+                android:id="@+id/setting_media_list"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content">
+
+            </android.support.v7.widget.RecyclerView>
+        </LinearLayout>
+    </ScrollView>
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="-45dp"
+        android:padding="3dp">
+
+        <TextView
+            android:id="@+id/setting_delete"
+            style="@style/style_text_mediainfo_title"
+            android:background="@drawable/selector_btn_corner"
+            android:gravity="center"
+            android:text="Delete"
+            android:textColor="@color/color_blue_btn_txt"/>
+
+        <TextView
+            android:id="@+id/setting_edit"
+            style="@style/style_text_mediainfo_title"
+            android:background="@drawable/selector_btn_corner"
+            android:gravity="center"
+            android:text="Edit"
+            android:textColor="@color/color_blue_btn_txt"
+            android:layout_marginLeft="3dp"/>
+
+        <TextView
+            android:id="@+id/setting_new"
+            style="@style/style_text_mediainfo_title"
+            android:background="@drawable/selector_btn_corner"
+            android:gravity="center"
+            android:text="New"
+            android:textColor="@color/color_blue_btn_txt"
+            android:layout_marginLeft="3dp"/>
+    </LinearLayout>
+
+
+</LinearLayout>

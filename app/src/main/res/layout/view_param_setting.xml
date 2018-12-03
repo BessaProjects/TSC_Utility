@@ -1,0 +1,231 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:orientation="vertical" android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:background="@android:color/black"
+    android:padding="10dp">
+
+    <CheckBox
+        android:id="@+id/param_setting_is_resize"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Auto Resize"
+        android:textColor="@android:color/white"
+        android:buttonTint="@android:color/white"/>
+
+    <LinearLayout
+        android:id="@+id/param_setting_bmp_width_parent"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical">
+
+        <LinearLayout
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal">
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:textColor="@android:color/white"
+                android:textSize="16dp"
+                android:text="Bitmap Width"
+                android:layout_gravity="bottom"
+                android:gravity="bottom"/>
+
+            <LinearLayout
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:orientation="vertical"
+                android:layout_marginLeft="5dp">
+
+                <EditText
+                    android:layout_width="100dp"
+                    android:layout_height="wrap_content"
+                    android:id="@+id/param_setting_bmp_width"
+                    android:padding="5dp"
+                    android:textColor="@android:color/white"
+                    android:textSize="16dp"
+                    android:inputType="number"
+                    android:background="@android:color/transparent"/>
+
+                <View
+                    android:layout_width="100dp"
+                    android:layout_height="1dp"
+                    android:background="@android:color/white"/>
+            </LinearLayout>
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:textColor="@android:color/white"
+                android:textSize="16dp"
+                android:text="px(高度動態計算)"
+                android:layout_marginLeft="5dp"
+                android:layout_gravity="bottom"
+                android:gravity="bottom"/>
+
+        </LinearLayout>
+
+        <RelativeLayout
+            android:layout_width="170dp"
+            android:layout_height="wrap_content"
+            android:padding="5dp"
+            android:layout_marginTop="15dp"
+            android:background="@drawable/img_bg_spinner_stroke">
+
+            <TextView
+                android:id="@+id/param_setting_dpi"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:textColor="@android:color/white"
+                android:textSize="16dp"
+                android:text="200Dpi"
+                android:layout_centerVertical="true"
+                android:layout_alignParentLeft="true"/>
+
+            <ImageView
+                android:layout_width="15dp"
+                android:layout_height="15dp"
+                android:src="@drawable/icon_arrow_down"
+                android:scaleType="fitCenter"
+                android:layout_alignParentRight="true"
+                android:layout_centerVertical="true"/>
+
+        </RelativeLayout>
+    </LinearLayout>
+
+
+    <LinearLayout
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal">
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:textColor="@android:color/white"
+            android:textSize="16dp"
+            android:text="Width"
+            android:layout_gravity="bottom"
+            android:gravity="bottom"/>
+
+        <LinearLayout
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            android:layout_marginLeft="5dp">
+
+            <EditText
+                android:layout_width="100dp"
+                android:layout_height="wrap_content"
+                android:id="@+id/param_setting_width"
+                android:padding="5dp"
+                android:textColor="@android:color/white"
+                android:textSize="16dp"
+                android:inputType="number"
+                android:background="@android:color/transparent"/>
+
+            <View
+                android:layout_width="100dp"
+                android:layout_height="1dp"
+                android:background="@android:color/white"/>
+        </LinearLayout>
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:textColor="@android:color/white"
+            android:textSize="16dp"
+            android:text="mm"
+            android:layout_marginLeft="5dp"
+            android:layout_gravity="bottom"
+            android:gravity="bottom"/>
+
+    </LinearLayout>
+
+    <LinearLayout
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:layout_marginTop="10dp">
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:textColor="@android:color/white"
+            android:textSize="16dp"
+            android:text="Height"
+            android:layout_gravity="bottom"
+            android:gravity="bottom"/>
+
+        <LinearLayout
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            android:layout_marginLeft="5dp">
+
+            <EditText
+                android:layout_width="100dp"
+                android:layout_height="wrap_content"
+                android:id="@+id/param_setting_height"
+                android:padding="5dp"
+                android:textColor="@android:color/white"
+                android:textSize="16dp"
+                android:inputType="number"
+                android:background="@android:color/transparent"/>
+
+            <View
+                android:layout_width="100dp"
+                android:layout_height="1dp"
+                android:background="@android:color/white"/>
+        </LinearLayout>
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:textColor="@android:color/white"
+            android:textSize="16dp"
+            android:text="mm"
+            android:layout_marginLeft="5dp"
+            android:layout_gravity="bottom"
+            android:gravity="bottom"/>
+
+    </LinearLayout>
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:layout_marginTop="10dp">
+
+        <TextView
+            android:id="@+id/param_setting_cancel"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:textColor="@android:color/white"
+            android:textSize="20dp"
+            android:text="Cancel"
+            android:layout_gravity="center"
+            android:gravity="center"
+            android:padding="8dp"
+            android:background="@drawable/img_bg_spinner_stroke"/>
+
+        <TextView
+            android:id="@+id/param_setting_save"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:textColor="@android:color/white"
+            android:textSize="20dp"
+            android:text="Save"
+            android:layout_gravity="center"
+            android:gravity="center"
+            android:padding="8dp"
+            android:layout_marginLeft="5dp"
+            android:background="@drawable/img_bg_spinner_stroke"/>
+
+    </LinearLayout>
+
+</LinearLayout>

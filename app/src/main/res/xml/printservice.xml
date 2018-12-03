@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="utf-8"?>
+<print-service xmlns:android="http://schemas.android.com/apk/res/android"
+    android:addPrintersActivity="printservice.tscprinters.com.tsc_printservice.AddPrintersActivity"
+    android:settingsActivity="printservice.tscprinters.com.tsc_printservice.SettingsActivity"
+    android:vendor="example" >
+
+</print-service>

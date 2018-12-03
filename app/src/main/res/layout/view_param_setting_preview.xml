@@ -1,0 +1,74 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:orientation="horizontal" android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:background="@color/color_main"
+    android:padding="5dp">
+
+    <CheckBox
+        android:id="@+id/param_setting_preview_auto_resize"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_weight="1"
+        android:textSize="16dp"
+        android:textColor="@android:color/white"
+        android:text="Auto Resize"
+        android:buttonTint="@android:color/white"/>
+
+    <RelativeLayout
+        android:id="@+id/param_setting_dpi_parent"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_gravity="center|left"
+        android:layout_weight="1"
+        android:background="@drawable/img_bg_spinner_stroke"
+        android:gravity="center|left"
+        android:padding="3dp">
+
+        <TextView
+            android:id="@+id/param_setting_dpi"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_alignParentLeft="true"
+            android:layout_centerVertical="true"
+            android:layout_marginLeft="3dp"
+            android:text="200Dpi"
+            android:textColor="@android:color/white"
+            android:textSize="16dp" />
+
+        <ImageView
+            android:layout_width="15dp"
+            android:layout_height="15dp"
+            android:layout_alignParentRight="true"
+            android:layout_centerVertical="true"
+            android:scaleType="fitCenter"
+            android:layout_marginRight="5dp"
+            android:src="@drawable/icon_arrow_down" />
+
+    </RelativeLayout>
+
+    <TextView
+        android:id="@+id/param_setting_preview"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:textSize="16dp"
+        android:textColor="@android:color/white"
+        android:gravity="center|left"
+        android:layout_below="@id/param_setting_dpi_parent"
+        android:padding="5dp"
+        android:text="Width:"
+        android:visibility="gone"/>
+
+    <ImageView
+        android:id="@+id/param_setting_preview_detail"
+        android:layout_width="35dp"
+        android:layout_height="35dp"
+        android:src="@drawable/icon_setting"
+        android:scaleType="fitCenter"
+        android:padding="5dp"
+        android:layout_alignParentRight="true"
+        android:layout_centerVertical="true"
+        android:layout_marginLeft="5dp"/>
+
+
+</LinearLayout>

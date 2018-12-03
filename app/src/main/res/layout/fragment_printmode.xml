@@ -1,0 +1,45 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@color/color_bg"
+    android:orientation="vertical">
+
+    <LinearLayout
+        android:id="@+id/printmode_barcode"
+        style="@style/style_info_parent"
+        android:background="@android:color/white">
+
+        <TextView
+            style="@style/style_info_title"
+            android:text="Barcode"
+            android:textColor="@color/color_blue_btn_txt" />
+    </LinearLayout>
+
+
+    <LinearLayout
+        android:id="@+id/printmode_file"
+        style="@style/style_info_parent"
+        android:background="@android:color/white"
+        android:layout_marginTop="1dp">
+
+        <TextView
+            style="@style/style_info_title"
+            android:text="File"
+            android:textColor="@color/color_blue_btn_txt" />
+    </LinearLayout>
+
+
+    <LinearLayout
+        android:id="@+id/printmode_test"
+        style="@style/style_info_parent"
+        android:background="@android:color/white"
+        android:layout_marginTop="1dp">
+
+        <TextView
+            style="@style/style_info_title"
+            android:text="Test Print"
+            android:textColor="@color/color_blue_btn_txt" />
+    </LinearLayout>
+
+</LinearLayout>

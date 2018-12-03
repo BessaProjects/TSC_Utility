@@ -1,0 +1,35 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    tools:context=".View.MainActivity">
+
+    <include
+        android:id="@+id/main_toolbar"
+        layout="@layout/toolbar"/>
+
+    <TextView
+        android:id="@+id/main_device_name"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:background="@color/color_red"
+        android:layout_below="@id/main_toolbar"
+        android:padding="10dp"
+        android:textColor="@android:color/white" />
+
+    <FrameLayout
+        android:id="@+id/main_framelayout"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:layout_below="@id/main_device_name"
+        android:layout_above="@+id/bottom_navigation"/>
+
+    <com.aurelhubert.ahbottomnavigation.AHBottomNavigation
+        android:id="@+id/bottom_navigation"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_alignParentBottom="true"/>
+
+</RelativeLayout>

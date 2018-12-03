@@ -1,0 +1,172 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:fresco="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical"
+    android:padding="20dp">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:background="@drawable/bg_default_dialog"
+        android:orientation="vertical">
+
+        <TextView
+            android:id="@+id/edit_title"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center"
+            android:gravity="center"
+            android:padding="15dp"
+            android:text="Media Editor"
+            android:textColor="@android:color/black"
+            android:textSize="22sp" />
+
+        <View
+            android:layout_width="match_parent"
+            android:layout_height="1dp"
+            android:background="#D0D0D0" />
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            android:padding="10dp">
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal">
+
+                <TextView
+                    style="@style/style_text_mediainfo_title"
+                    android:text="name" />
+
+                <EditText
+                    android:id="@+id/mediainfo_editor_name"
+                    style="@style/style_edittext_mediainfo_title"
+                    android:layout_marginLeft="5dp" />
+
+            </LinearLayout>
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="10dp"
+                android:orientation="horizontal">
+
+                <TextView
+                    style="@style/style_text_mediainfo_title"
+                    android:text="width" />
+
+                <EditText
+                    android:id="@+id/mediainfo_editor_width"
+                    style="@style/style_edittext_mediainfo_title"
+                    android:layout_marginLeft="5dp"
+                    android:inputType="numberDecimal" />
+            </LinearLayout>
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="10dp"
+                android:orientation="horizontal">
+
+                <TextView
+                    style="@style/style_text_mediainfo_title"
+                    android:text="height" />
+
+                <EditText
+                    android:id="@+id/mediainfo_editor_height"
+                    style="@style/style_edittext_mediainfo_title"
+                    android:layout_marginLeft="5dp"
+                    android:inputType="numberDecimal" />
+
+            </LinearLayout>
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="10dp"
+                android:layout_marginLeft="20dp"
+                android:layout_marginRight="20dp"
+                android:orientation="horizontal">
+
+                <RadioButton
+                    android:id="@+id/mediainfo_editor_unit_in"
+                    style="@style/style_text_mediainfo_title"
+                    android:text="in"/>
+
+                <RadioButton
+                    android:id="@+id/mediainfo_editor_unit_mm"
+                    style="@style/style_text_mediainfo_title"
+                    android:text="mm"/>
+
+            </LinearLayout>
+        </LinearLayout>
+
+        <View
+            android:layout_width="match_parent"
+            android:layout_height="1dp"
+            android:background="#D0D0D0"/>
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="48dp"
+            android:orientation="horizontal">
+
+            <TextView
+                android:id="@+id/dialog_edit_btn_left"
+                android:layout_width="0dp"
+                android:layout_height="match_parent"
+                android:layout_gravity="center"
+                android:layout_weight="1"
+                android:background="@drawable/selector_btn_corner_bot_left"
+                android:gravity="center"
+                android:text="@string/general_cancel"
+                android:textColor="@color/color_blue_btn_txt"
+                android:textSize="18dp" />
+
+            <View
+                android:id="@+id/default_two_btn_divider"
+                android:layout_width="1dp"
+                android:layout_height="match_parent"
+                android:background="#D0D0D0" />
+
+            <TextView
+                android:id="@+id/dialog_edit_btn_right"
+                android:layout_width="0dp"
+                android:layout_height="match_parent"
+                android:layout_gravity="center"
+                android:layout_weight="1"
+                android:background="@drawable/selector_btn_corner_bot_right"
+                android:gravity="center"
+                android:text="@string/general_confirm"
+                android:textColor="@color/color_blue_btn_txt"
+                android:textSize="18dp" />
+        </LinearLayout>
+
+        <TableLayout
+            android:layout_width="match_parent"
+            android:layout_height="match_parent">
+
+            <TableRow
+                android:layout_width="match_parent"
+                android:layout_height="match_parent" />
+
+            <TableRow
+                android:layout_width="match_parent"
+                android:layout_height="match_parent" />
+
+            <TableRow
+                android:layout_width="match_parent"
+                android:layout_height="match_parent" />
+
+            <TableRow
+                android:layout_width="match_parent"
+                android:layout_height="match_parent" />
+        </TableLayout>
+    </LinearLayout>
+
+
+</LinearLayout>

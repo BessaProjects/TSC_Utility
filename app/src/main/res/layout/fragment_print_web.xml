@@ -1,0 +1,39 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent" android:layout_height="match_parent">
+
+    <android.support.v4.view.ViewPager
+        android:id="@+id/photo_viewpager"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:layout_below="@id/photo_view_setting_preview"/>
+
+    <TextView
+        android:id="@+id/photo_viewpager_index"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:textSize="20dp"
+        android:textColor="@android:color/white"
+        android:layout_alignParentBottom="true"
+        android:layout_alignParentRight="true"
+        android:layout_margin="10dp"
+        android:text="1/1"
+        android:shadowColor="#000000"
+        android:shadowRadius="1"
+        android:shadowDx="3"
+        android:shadowDy="3"/>
+
+    <ImageView
+        android:id="@+id/photo_view_printer"
+        android:layout_width="50dp"
+        android:layout_height="50dp"
+        android:background="@drawable/icon_img_circle"
+        android:scaleType="fitCenter"
+        android:src="@drawable/icon_printer"
+        android:layout_alignParentBottom="true"
+        android:layout_alignParentRight="true"
+        android:layout_marginBottom="50dp"
+        android:layout_marginRight="30dp"
+        android:padding="15dp"/>
+
+</RelativeLayout>

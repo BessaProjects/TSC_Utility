@@ -1,0 +1,118 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@color/color_bg"
+    android:orientation="vertical">
+
+    <LinearLayout
+        android:id="@+id/connect_connect"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical">
+
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:background="@android:color/white"
+            android:padding="15dp"
+            android:text="Please select connection method."
+            android:textColor="@android:color/black"
+            android:textSize="14sp" />
+
+        <LinearLayout
+            android:id="@+id/connect_wifi"
+            style="@style/style_info_parent"
+            android:layout_marginTop="1dp"
+            android:background="@android:color/white">
+
+            <ImageView style="@style/style_info_icon"
+                android:src="@drawable/icon_wifi"
+                android:tint="@color/color_blue_btn_txt" />
+
+            <TextView
+                style="@style/style_info_title"
+                android:text="Wifi"
+                android:textColor="@color/color_blue_btn_txt" />
+        </LinearLayout>
+
+        <LinearLayout
+            android:id="@+id/connect_ble"
+            style="@style/style_info_parent"
+            android:layout_marginTop="1dp"
+            android:background="@android:color/white">
+
+            <ImageView style="@style/style_info_icon"
+                android:src="@drawable/icon_bluetooth"
+                android:tint="@color/color_blue_btn_txt"/>
+
+            <TextView
+                style="@style/style_info_title"
+                android:text="Bluetooth"
+                android:textColor="@color/color_blue_btn_txt" />
+        </LinearLayout>
+    </LinearLayout>
+
+    <LinearLayout
+        android:id="@+id/connect_disconnect"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical">
+
+        <LinearLayout style="@style/style_info_parent">
+
+            <TextView
+                style="@style/style_info_title"
+                android:text="Device" />
+
+            <TextView
+                android:id="@+id/connect_device"
+                style="@style/style_info_content"
+                android:text="TX200" />
+
+        </LinearLayout>
+
+        <LinearLayout style="@style/style_info_parent">
+
+            <TextView style="@style/style_info_title" />
+
+            <TextView
+                android:id="@+id/connect_address"
+                style="@style/style_info_content"
+                android:text="00-00-00-00" />
+
+        </LinearLayout>
+
+        <LinearLayout style="@style/style_info_parent">
+
+            <TextView style="@style/style_info_title"
+                android:text="Battery"  />
+
+            <TextView
+                android:id="@+id/connect_battery"
+                style="@style/style_info_content"
+                android:text="40%" />
+
+        </LinearLayout>
+
+        <RelativeLayout
+            android:layout_width="match_parent"
+            android:layout_height="match_parent">
+
+            <TextView
+                android:id="@+id/connect_disconnect_action"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:textColor="@color/color_blue_btn_txt"
+                android:layout_alignParentBottom="true"
+                android:textSize="18sp"
+                android:padding="10dp"
+                android:layout_marginTop="5dp"
+                android:background="@android:color/white"
+                android:layout_gravity="center"
+                android:gravity="center"
+                android:text="Disconnect"/>
+
+        </RelativeLayout>
+    </LinearLayout>
+</RelativeLayout>

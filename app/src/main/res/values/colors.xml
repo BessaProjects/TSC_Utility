@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <color name="colorPrimary">@color/color_main</color>
+    <color name="colorPrimaryDark">@color/color_main</color>
+    <color name="colorAccent">@color/color_main</color>
+
+    <color name="color_main">#00489A</color>
+
+    <color name="color_text_hint_gray">#C0C0C0</color>
+
+    <color name="color_blue_btn_txt">#0076FF</color>
+
+    <color name="color_bg">#C0C0C0</color>
+    <color name="color_red">#F02121</color>
+</resources>

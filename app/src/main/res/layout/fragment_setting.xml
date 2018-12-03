@@ -1,0 +1,181 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@color/color_bg"
+    android:orientation="vertical">
+
+    <ScrollView
+        android:layout_width="match_parent"
+        android:layout_height="match_parent">
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical">
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:background="@android:color/white"
+                android:orientation="vertical">
+
+                <LinearLayout style="@style/style_info_parent">
+
+                    <TextView
+                        style="@style/style_info_title"
+                        android:text="Device" />
+
+                    <TextView
+                        android:id="@+id/setting_name"
+                        style="@style/style_info_content"
+                        android:text="Device" />
+
+                </LinearLayout>
+
+                <View style="@style/style_horizontal_divider" />
+
+                <LinearLayout style="@style/style_info_parent">
+
+                    <TextView
+                        style="@style/style_info_title"
+                        android:text="Label Width" />
+
+                    <TextView
+                        android:id="@+id/setting_label_width"
+                        style="@style/style_info_content"
+                        android:text="Device" />
+
+                </LinearLayout>
+
+                <View style="@style/style_horizontal_divider" />
+
+                <LinearLayout style="@style/style_info_parent">
+
+                    <TextView
+                        style="@style/style_info_title"
+                        android:text="Label Height" />
+
+                    <TextView
+                        android:id="@+id/setting_label_height"
+                        style="@style/style_info_content"
+                        android:text="Device" />
+
+                </LinearLayout>
+
+                <View style="@style/style_horizontal_divider" />
+
+                <LinearLayout style="@style/style_info_parent">
+
+                    <TextView
+                        style="@style/style_info_title"
+                        android:text="Speed" />
+
+                    <TextView
+                        android:id="@+id/setting_speed"
+                        style="@style/style_info_content"
+                        android:text="Device" />
+
+                </LinearLayout>
+
+                <View style="@style/style_horizontal_divider" />
+
+                <LinearLayout style="@style/style_info_parent">
+
+                    <TextView
+                        style="@style/style_info_title"
+                        android:text="Density" />
+
+                    <TextView
+                        android:id="@+id/setting_density"
+                        style="@style/style_info_content"
+                        android:text="Device" />
+
+                </LinearLayout>
+
+                <View style="@style/style_horizontal_divider" />
+
+                <LinearLayout style="@style/style_info_parent">
+
+                    <TextView
+                        style="@style/style_info_title"
+                        android:text="Sensor Type" />
+
+                    <TextView
+                        android:id="@+id/setting_sensor_type"
+                        style="@style/style_info_content"
+                        android:text="GAP" />
+
+                </LinearLayout>
+
+                <View style="@style/style_horizontal_divider" />
+
+            </LinearLayout>
+
+            <LinearLayout
+                android:id="@+id/setting_speed_set"
+                style="@style/style_info_parent"
+                android:layout_marginTop="20dp"
+                android:background="@android:color/white">
+
+                <ImageView style="@style/style_info_icon"
+                    android:src="@drawable/icon_speed"
+                    android:tint="@color/color_blue_btn_txt"/>
+
+                <TextView
+                    style="@style/style_info_title"
+                    android:text="Speed"
+                    android:textColor="@color/color_blue_btn_txt" />
+            </LinearLayout>
+
+            <LinearLayout
+                android:id="@+id/setting_media_size_set"
+                style="@style/style_info_parent"
+                android:layout_marginTop="1dp"
+                android:background="@android:color/white">
+
+                <ImageView style="@style/style_info_icon"
+                    android:src="@drawable/icon_size"
+                    android:tint="@color/color_blue_btn_txt"/>
+
+                <TextView
+                    style="@style/style_info_title"
+                    android:text="Media size"
+                    android:textColor="@color/color_blue_btn_txt" />
+            </LinearLayout>
+
+            <LinearLayout
+                android:id="@+id/setting_sensor_type_set"
+                style="@style/style_info_parent"
+                android:layout_marginTop="1dp"
+                android:background="@android:color/white">
+
+                <ImageView style="@style/style_info_icon"
+                    android:src="@drawable/icon_speed"
+                    android:tint="@color/color_blue_btn_txt"/>
+
+                <TextView
+                    style="@style/style_info_title"
+                    android:text="Sensor Type"
+                    android:textColor="@color/color_blue_btn_txt" />
+            </LinearLayout>
+
+            <LinearLayout
+                android:id="@+id/setting_density_set"
+                style="@style/style_info_parent"
+                android:layout_marginTop="1dp"
+                android:background="@android:color/white">
+
+                <ImageView style="@style/style_info_icon"
+                    android:src="@drawable/icon_speed"
+                    android:tint="@color/color_blue_btn_txt"/>
+
+                <TextView
+                    style="@style/style_info_title"
+                    android:text="Density"
+                    android:textColor="@color/color_blue_btn_txt" />
+            </LinearLayout>
+        </LinearLayout>
+    </ScrollView>
+
+</LinearLayout>

@@ -1,0 +1,57 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:orientation="vertical"
+    android:background="@color/color_main">
+
+    <View
+        android:id="@+id/toolbar_top_padding"
+        android:layout_width="match_parent"
+        android:layout_height="5dp"/>
+
+    <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+        android:layout_width="match_parent"
+        android:layout_height="40dp">
+
+        <ImageView
+            android:id="@+id/toolbar_left"
+            android:layout_width="40dp"
+            android:layout_height="40dp"
+            android:layout_alignParentLeft="true"
+            android:padding="10dp"
+            android:src="@drawable/icon_arrow_left" />
+
+        <TextView
+            android:id="@+id/toolbar_title"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_centerInParent="true"
+            android:text="@string/app_name"
+            android:textColor="@android:color/white"
+            android:textSize="18dp" />
+
+        <ImageView
+            android:id="@+id/toolbar_right_2"
+            android:layout_width="40dp"
+            android:layout_height="40dp"
+            android:layout_toLeftOf="@+id/toolbar_right"
+            android:src="@drawable/icon_crop"
+            android:padding="10dp"
+            android:visibility="gone"/>
+
+        <ImageView
+            android:id="@+id/toolbar_right"
+            android:layout_width="40dp"
+            android:layout_height="40dp"
+            android:layout_alignParentRight="true"
+            android:src="@drawable/icon_setting"
+            android:padding="10dp"
+            android:visibility="gone"/>
+    </RelativeLayout>
+
+    <View
+        android:layout_width="match_parent"
+        android:layout_height="1dp"
+        android:background="#707070"/>
+</LinearLayout>

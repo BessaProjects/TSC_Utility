@@ -1,0 +1,31 @@
+<resources>
+    <string name="app_name">Print Utility</string>
+
+    <string name="main_tab_setting">Setting</string>
+    <string name="main_tab_command">Command</string>
+    <string name="main_tab_connect">Connect</string>
+    <string name="main_tab_print">Print</string>
+
+
+    <string name="general_edit">Edit</string>
+    <string name="general_upload">Upload</string>
+    <string name="general_leave">Leave</string>
+    <string name="general_delete">Delete</string>
+
+    <string name="general_choose_image">Pick album</string>
+    <string name="general_choose_camera">Pick Camera</string>
+    <string name="general_url">Url</string>
+    <string name="general_camera">Camera</string>
+    <string name="general_image">Album</string>
+    <string name="general_cancel">Cancel</string>
+    <string name="general_confirm">Confirm</string>
+    <string name="general_reset">Reset</string>
+    <string name="general_apply">Apply</string>
+    <string name="general_optional">Optional</string>
+    <string name="general_personal_info">Personal Info</string>
+    <string name="general_anyone_can_see">Anyone can see</string>
+    <string name="general_report_improper_use">Report improper use</string>
+    <string name="general_age_range">Age range</string>
+    <string name="general_unavailable">Unavailable</string>
+</resources>
+
