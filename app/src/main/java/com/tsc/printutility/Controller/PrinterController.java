@@ -324,6 +324,22 @@ public class PrinterController {
         }
     }
 
+    public String sendCommand(String command){
+        if(mWifi != null){
+            boolean result = isWifiPrinterConnected();
+            if(result){
+                return mWifi.sendcommand(command);
+            }
+        }
+        else if(mBle != null){
+            boolean result = isBlePrinterConnected();
+            if(result){
+                return mBle.sendcommand(command);
+            }
+        }
+        return "-2";
+    }
+
     public void closeport(){
         closeport(null);
     }

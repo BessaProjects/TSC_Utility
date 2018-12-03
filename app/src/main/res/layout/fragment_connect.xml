@@ -51,6 +51,22 @@
                 android:text="Bluetooth"
                 android:textColor="@color/color_blue_btn_txt" />
         </LinearLayout>
+
+        <LinearLayout
+            android:id="@+id/connect_clear"
+            style="@style/style_info_parent"
+            android:layout_marginTop="1dp"
+            android:background="@android:color/white">
+
+            <ImageView style="@style/style_info_icon"
+                android:src="@drawable/icon_delete"
+                android:tint="@color/color_blue_btn_txt" />
+
+            <TextView
+                style="@style/style_info_title"
+                android:text="Clear connected record"
+                android:textColor="@color/color_blue_btn_txt" />
+        </LinearLayout>
     </LinearLayout>
 
     <LinearLayout

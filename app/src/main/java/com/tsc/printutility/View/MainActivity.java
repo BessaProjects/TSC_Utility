@@ -53,25 +53,26 @@ public class MainActivity extends BaseActivity {
         mFragmentManager = getSupportFragmentManager();
 
         // Create items
-        AHBottomNavigationItem item1 = new AHBottomNavigationItem(R.string.main_tab_setting, R.drawable.crop_image_menu_flip, android.R.color.white);
-        AHBottomNavigationItem item2 = new AHBottomNavigationItem(R.string.main_tab_command, R.drawable.crop_image_menu_flip, android.R.color.white);
-        AHBottomNavigationItem item3 = new AHBottomNavigationItem(R.string.main_tab_connect, R.drawable.crop_image_menu_flip, android.R.color.white);
-        AHBottomNavigationItem item4 = new AHBottomNavigationItem(R.string.main_tab_print, R.drawable.crop_image_menu_flip, android.R.color.white);
+        AHBottomNavigationItem item1 = new AHBottomNavigationItem(R.string.main_tab_setting, R.drawable.icon_setting, android.R.color.white);
+        AHBottomNavigationItem item2 = new AHBottomNavigationItem(R.string.main_tab_command, R.drawable.icon_command, android.R.color.white);
+        AHBottomNavigationItem item3 = new AHBottomNavigationItem(R.string.main_tab_connect, R.drawable.icon_connect, android.R.color.white);
+        AHBottomNavigationItem item4 = new AHBottomNavigationItem(R.string.main_tab_print, R.drawable.icon_printer, android.R.color.white);
 
 // Add items
         mBottomNavigation.addItem(item1);
+        mBottomNavigation.addItem(item4);
         mBottomNavigation.addItem(item2);
         mBottomNavigation.addItem(item3);
-        mBottomNavigation.addItem(item4);
 
         mBottomNavigation.setDefaultBackgroundColor(getResources().getColor(R.color.color_main));
 
-        mBottomNavigation.setAccentColor(Color.WHITE);
-        mBottomNavigation.setInactiveColor(Color.parseColor("#B0B0B0"));
+        mBottomNavigation.setAccentColor(Color.YELLOW);
+        mBottomNavigation.setInactiveColor(Color.WHITE);
+//        mBottomNavigation.setAccentColor(Color.parseColor("#F63D2B"));
+        mBottomNavigation.setCurrentItem(0);
 
-        mBottomNavigation.setForceTint(true);
-
-        mBottomNavigation.setTranslucentNavigationEnabled(true);
+//        mBottomNavigation.setForceTint(true);
+//        mBottomNavigation.setTranslucentNavigationEnabled(true);
         mBottomNavigation.setTitleState(AHBottomNavigation.TitleState.ALWAYS_SHOW);
 
         mBottomNavigation.setOnTabSelectedListener(new AHBottomNavigation.OnTabSelectedListener() {
@@ -82,13 +83,13 @@ public class MainActivity extends BaseActivity {
                         gotoFragment(FragmentPage.PAGE_SETTING);
                         break;
                     case 1:
-                        gotoFragment(FragmentPage.PAGE_COMMAND);
+                        gotoFragment(FragmentPage.PAGE_PRINT);
                         break;
                     case 2:
-                        gotoFragment(FragmentPage.PAGE_CONNECT);
+                        gotoFragment(FragmentPage.PAGE_COMMAND);
                         break;
                     case 3:
-                        gotoFragment(FragmentPage.PAGE_PRINT);
+                        gotoFragment(FragmentPage.PAGE_CONNECT);
                         break;
 
                 }

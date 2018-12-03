@@ -5,6 +5,7 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.tsc.printutility.Constant;
 import com.tsc.printutility.Controller.PrinterController;
@@ -37,7 +38,7 @@ public class ConnectFragment extends BaseFragment{
         updateUI();
     }
 
-    @OnClick({R.id.connect_wifi, R.id.connect_ble, R.id.connect_disconnect_action})
+    @OnClick({R.id.connect_wifi, R.id.connect_ble, R.id.connect_clear, R.id.connect_disconnect_action})
     public void onClick(View view){
         switch (view.getId()){
             case R.id.connect_wifi:
@@ -70,6 +71,13 @@ public class ConnectFragment extends BaseFragment{
                         }
                     }
                 });
+                break;
+            case R.id.connect_clear:
+                PrefUtil.removePreference(mContext, Constant.Pref.LAST_CONNECTED_DEVICE);
+                PrefUtil.removePreference(mContext, Constant.Pref.DEVICE_BT_ADDRESS);
+                PrefUtil.removePreference(mContext, Constant.Pref.DEVICE_BT_NAME);
+                PrefUtil.removePreference(mContext, Constant.Pref.DEVICE_WIFI_ADDRESS);
+                Toast.makeText(mContext, "已清除連線紀錄", Toast.LENGTH_LONG).show();
                 break;
             case R.id.connect_disconnect_action:
                 PrinterController.getInstance(mContext).closeport(new PrinterController.OnPrintCompletedListener() {

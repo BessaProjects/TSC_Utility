@@ -6,7 +6,9 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.EditText;
 import android.widget.TextView;
+import android.widget.Toast;
 
+import com.tsc.printutility.Controller.PrinterController;
 import com.tsc.printutility.R;
 
 import butterknife.BindView;
@@ -32,6 +34,9 @@ public class CommandFragment extends BaseFragment{
         switch (view.getId()){
             case R.id.command_send:
                 mSendData.append(mInput.getText() + "\n");
+                if(!PrinterController.getInstance(mContext).sendCommand(mInput.getText() + "").equals("1")){
+                    Toast.makeText(mContext, "Send command failed, please check device connection", Toast.LENGTH_LONG).show();
+                }
                 break;
         }
     }
