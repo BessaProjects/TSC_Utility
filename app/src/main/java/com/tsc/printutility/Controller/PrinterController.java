@@ -1,5 +1,6 @@
 package com.tsc.printutility.Controller;
 
+import android.app.Activity;
 import android.content.Context;
 import android.graphics.Bitmap;
 import android.graphics.pdf.PdfRenderer;
@@ -82,6 +83,7 @@ public class PrinterController {
         if(mBle == null)
             mBle = new TSCActivity();
         String resultBtOpen = mBle.openport(ipaddress);
+        System.out.println("connectBlePrinter result:" + resultBtOpen);
         if(resultBtOpen.equals("1"))
             return true;
         return false;
@@ -174,6 +176,7 @@ public class PrinterController {
         if(mWifi == null)
             mWifi = new TscWifiActivity();
         String resultBtOpen = mWifi.openport(ipaddress, 9100);
+        System.out.println("connectWifiPrinter result:" + resultBtOpen);
         if(resultBtOpen.equals("1"))
             return true;
         return false;
@@ -343,8 +346,14 @@ public class PrinterController {
                 } catch (InterruptedException e) {
                     e.printStackTrace();
                 }
-                if(listener != null)
-                    listener.onCompleted(true, "");
+                ((Activity)mContext).runOnUiThread(new Runnable() {
+                    @Override
+                    public void run() {
+                        if(listener != null)
+                            listener.onCompleted(true, "");
+                    }
+                });
+
             }
         }).start();
     }

@@ -176,7 +176,7 @@ public class BaseActivity extends AppCompatActivity {
     }
 
     public void showIpDeviceList(final OnDeviceSelectedListener listener){
-        WifiContoller.getInstance(this).getIpList(new WifiContoller.OnIpDiscoveryFinishedListener() {
+        WifiContoller.getInstance(this).discoveryPrinter(new WifiContoller.OnIpDiscoveryFinishedListener() {
             @Override
             public void onFinished(final List<String> list, boolean isFinished) {
                 if(isFinished){
@@ -449,6 +449,10 @@ public class BaseActivity extends AppCompatActivity {
                 }
             }
         }
+    }
+
+    public void setConnect(boolean connect){
+        mIsConnected = connect;
     }
 
     public boolean isConnected(){

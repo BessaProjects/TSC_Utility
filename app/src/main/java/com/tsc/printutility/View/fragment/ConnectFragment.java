@@ -6,7 +6,10 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.TextView;
 
+import com.tsc.printutility.Constant;
+import com.tsc.printutility.Controller.PrinterController;
 import com.tsc.printutility.R;
+import com.tsc.printutility.Util.PrefUtil;
 import com.tsc.printutility.View.BaseActivity;
 
 import butterknife.BindView;
@@ -31,6 +34,58 @@ public class ConnectFragment extends BaseFragment{
     public void onResume(){
         super.onResume();
 
+        updateUI();
+    }
+
+    @OnClick({R.id.connect_wifi, R.id.connect_ble, R.id.connect_disconnect_action})
+    public void onClick(View view){
+        switch (view.getId()){
+            case R.id.connect_wifi:
+                ((BaseActivity)mContext).showProgress("Discovering...");
+                ((BaseActivity)mContext).showIpDeviceList(new BaseActivity.OnDeviceSelectedListener() {
+                    @Override
+                    public void onSelected(String name, String address) {
+                        PrefUtil.setStringPreference(mContext, Constant.Pref.LAST_CONNECTED_DEVICE, Constant.DeviceType.WIFI);
+                        PrefUtil.setStringPreference(mContext, Constant.Pref.DEVICE_WIFI_ADDRESS, address);
+                        if(PrinterController.getInstance(mContext).connectWifiPrinter(address)) {
+                            ((BaseActivity)mContext).setConnect(true);
+                            updateUI();
+                            mAddress.setText(address);
+                        }
+                    }
+                });
+                break;
+            case R.id.connect_ble:
+                ((BaseActivity)mContext).showProgress("Discovering...");
+                ((BaseActivity)mContext).showBleDeviceList(new BaseActivity.OnDeviceSelectedListener() {
+                    @Override
+                    public void onSelected(String name, String address) {
+                        PrefUtil.setStringPreference(mContext, Constant.Pref.LAST_CONNECTED_DEVICE, Constant.DeviceType.BLUETOOTH);
+                        PrefUtil.setStringPreference(mContext, Constant.Pref.DEVICE_BT_ADDRESS, address);
+                        PrefUtil.setStringPreference(mContext, Constant.Pref.DEVICE_BT_NAME, name);
+                        if(PrinterController.getInstance(mContext).connectBlePrinter(address)) {
+                            ((BaseActivity)mContext).setConnect(true);
+                            updateUI();
+                            mAddress.setText(address);
+                        }
+                    }
+                });
+                break;
+            case R.id.connect_disconnect_action:
+                PrinterController.getInstance(mContext).closeport(new PrinterController.OnPrintCompletedListener() {
+                    @Override
+                    public void onCompleted(boolean isSuccess, String message) {
+                        if(isSuccess){
+                            ((BaseActivity)mContext).setConnect(false);
+                            updateUI();
+                        }
+                    }
+                });
+                break;
+        }
+    }
+
+    private void updateUI(){
         if(((BaseActivity)mContext).isConnected()){
             mConnect.setVisibility(View.GONE);
             mDisconnect.setVisibility(View.VISIBLE);
@@ -40,20 +95,6 @@ public class ConnectFragment extends BaseFragment{
         else{
             mConnect.setVisibility(View.VISIBLE);
             mDisconnect.setVisibility(View.GONE);
-        }
-    }
-
-    @OnClick({R.id.connect_wifi, R.id.connect_ble, R.id.connect_disconnect_action})
-    public void onClick(View view){
-        switch (view.getId()){
-            case R.id.connect_wifi:
-
-                break;
-            case R.id.connect_ble:
-
-                break;
-            case R.id.connect_disconnect_action:
-                break;
         }
     }
 }
