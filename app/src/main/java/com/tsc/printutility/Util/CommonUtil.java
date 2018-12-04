@@ -19,6 +19,21 @@ public class CommonUtil {
 
     private static final String TAG = CommonUtil.class.getSimpleName();
 
+    public static String byteArrayToHexString(byte[] array) {
+        StringBuffer hexString = new StringBuffer();
+        for (byte b : array) {
+            int intVal = b & 0xff;
+            if (intVal < 0x10)
+                hexString.append("0");
+
+            hexString.append(Integer.toHexString(intVal).toUpperCase() + ":");
+        }
+        if(hexString.length() > 0)
+            return hexString.toString().substring(0, hexString.length() - 1);
+        else
+            return hexString.toString();
+    }
+
     public static void gotoGooglePlay(Context context){
         final String appPackageName = context.getPackageName(); // getPackageName() from Context or Activity object
         try {

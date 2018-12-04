@@ -28,7 +28,7 @@ public class PrintFragment extends BaseFragment{
                 ((MainActivity)mContext).gotoFragment(MainActivity.FragmentPage.PAGE_PRINT_FILE);
                 break;
             case R.id.printmode_test:
-                ((MainActivity)mContext).gotoFragment(MainActivity.FragmentPage.PAGE_PRINT_WEB);
+//                ((MainActivity)mContext).gotoFragment(MainActivity.FragmentPage.PAGE_PRINT_WEB);
                 break;
         }
     }

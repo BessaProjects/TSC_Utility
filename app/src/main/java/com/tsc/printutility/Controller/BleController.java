@@ -79,11 +79,22 @@ public class BleController {
             else if (BluetoothDevice.ACTION_FOUND.equals(action)) {
                 //bluetooth device found
                 BluetoothDevice device = intent.getParcelableExtra(BluetoothDevice.EXTRA_DEVICE);
-                mDeviceList.add(device);
-                if(mOnBleDiscoveryFinishedListener != null)
-                    mOnBleDiscoveryFinishedListener.onFinished(mDeviceList, false);
-                System.out.println("aaadevice:" + device.getAddress());
+                if(!checkRepeat(device.getAddress())){
+                    mDeviceList.add(device);
+                    if (mOnBleDiscoveryFinishedListener != null)
+                        mOnBleDiscoveryFinishedListener.onFinished(mDeviceList, false);
+                    System.out.println("aaadevice:" + device.getAddress());
+                }
             }
         }
     };
+
+    private boolean checkRepeat(String address){
+        for(BluetoothDevice device:mDeviceList){
+            if(device.getAddress().equals(address)){
+                return true;
+            }
+        }
+        return false;
+    }
 }

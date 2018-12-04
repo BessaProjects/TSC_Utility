@@ -15,6 +15,10 @@ import com.tsc.printutility.View.BaseActivity;
 
 import butterknife.BindView;
 import butterknife.OnClick;
+import rebus.permissionutils.PermissionEnum;
+import rebus.permissionutils.PermissionManager;
+import rebus.permissionutils.PermissionUtils;
+import rebus.permissionutils.SimpleCallback;
 
 public class ConnectFragment extends BaseFragment{
 
@@ -45,32 +49,37 @@ public class ConnectFragment extends BaseFragment{
                 ((BaseActivity)mContext).showProgress("Discovering...");
                 ((BaseActivity)mContext).showIpDeviceList(new BaseActivity.OnDeviceSelectedListener() {
                     @Override
-                    public void onSelected(String name, String address) {
+                    public void onSelected(String name, final String address) {
                         PrefUtil.setStringPreference(mContext, Constant.Pref.LAST_CONNECTED_DEVICE, Constant.DeviceType.WIFI);
                         PrefUtil.setStringPreference(mContext, Constant.Pref.DEVICE_WIFI_ADDRESS, address);
-                        if(PrinterController.getInstance(mContext).connectWifiPrinter(address)) {
-                            ((BaseActivity)mContext).setConnect(true);
-                            updateUI();
-                            mAddress.setText(address);
-                        }
+                        PrinterController.getInstance(mContext).connectWifiPrinter(address, new PrinterController.OnConnectListener() {
+                            @Override
+                            public void onConnect(boolean isSuccess) {
+                                if(isSuccess) {
+                                    ((BaseActivity) mContext).setConnect(true);
+                                    mAddress.setText(address);
+                                }
+                                updateUI();
+                            }
+                        });
                     }
                 });
                 break;
             case R.id.connect_ble:
-                ((BaseActivity)mContext).showProgress("Discovering...");
-                ((BaseActivity)mContext).showBleDeviceList(new BaseActivity.OnDeviceSelectedListener() {
-                    @Override
-                    public void onSelected(String name, String address) {
-                        PrefUtil.setStringPreference(mContext, Constant.Pref.LAST_CONNECTED_DEVICE, Constant.DeviceType.BLUETOOTH);
-                        PrefUtil.setStringPreference(mContext, Constant.Pref.DEVICE_BT_ADDRESS, address);
-                        PrefUtil.setStringPreference(mContext, Constant.Pref.DEVICE_BT_NAME, name);
-                        if(PrinterController.getInstance(mContext).connectBlePrinter(address)) {
-                            ((BaseActivity)mContext).setConnect(true);
-                            updateUI();
-                            mAddress.setText(address);
-                        }
-                    }
-                });
+                if(!PermissionUtils.isGranted(mContext, PermissionEnum.ACCESS_COARSE_LOCATION)) {
+                    PermissionManager.Builder()
+                            .permission(PermissionEnum.ACCESS_COARSE_LOCATION)
+                            .callback(new SimpleCallback() {
+                                @Override
+                                public void result(boolean allPermissionsGranted) {
+                                    if (allPermissionsGranted)
+                                        connectBle();
+                                }
+                            })
+                            .ask(this);
+                }
+                else
+                    connectBle();
                 break;
             case R.id.connect_clear:
                 PrefUtil.removePreference(mContext, Constant.Pref.LAST_CONNECTED_DEVICE);
@@ -93,11 +102,33 @@ public class ConnectFragment extends BaseFragment{
         }
     }
 
+    private void connectBle(){
+        ((BaseActivity)mContext).showProgress("Discovering...");
+        ((BaseActivity)mContext).showBleDeviceList(new BaseActivity.OnDeviceSelectedListener() {
+            @Override
+            public void onSelected(String name, final String address) {
+                System.out.println("BLE address:" + address);
+                PrefUtil.setStringPreference(mContext, Constant.Pref.LAST_CONNECTED_DEVICE, Constant.DeviceType.BLUETOOTH);
+                PrefUtil.setStringPreference(mContext, Constant.Pref.DEVICE_BT_ADDRESS, address);
+                PrefUtil.setStringPreference(mContext, Constant.Pref.DEVICE_BT_NAME, name);
+                PrinterController.getInstance(mContext).connectBlePrinter(address, new PrinterController.OnConnectListener() {
+                    @Override
+                    public void onConnect(boolean isSuccess) {
+                        if(isSuccess){
+                            ((BaseActivity)mContext).setConnect(true);
+                            mAddress.setText(address);
+                        }
+                        updateUI();
+                    }
+                });
+            }
+        });
+    }
+
     private void updateUI(){
         if(((BaseActivity)mContext).isConnected()){
             mConnect.setVisibility(View.GONE);
             mDisconnect.setVisibility(View.VISIBLE);
-
             mAddress.setText(((BaseActivity)mContext).getConnectIp());
         }
         else{

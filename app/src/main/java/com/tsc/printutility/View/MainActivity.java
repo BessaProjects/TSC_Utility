@@ -1,19 +1,27 @@
 package com.tsc.printutility.View;
 
+import android.app.PendingIntent;
+import android.bluetooth.BluetoothAdapter;
 import android.content.Intent;
 import android.graphics.Color;
+import android.nfc.NfcAdapter;
+import android.nfc.Tag;
 import android.os.Bundle;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentTransaction;
 import android.view.View;
 import android.widget.ImageView;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.aurelhubert.ahbottomnavigation.AHBottomNavigation;
 import com.aurelhubert.ahbottomnavigation.AHBottomNavigationItem;
 import com.facebook.drawee.backends.pipeline.Fresco;
 import com.tsc.printutility.Constant;
+import com.tsc.printutility.Controller.PrinterController;
 import com.tsc.printutility.R;
+import com.tsc.printutility.Util.CommonUtil;
+import com.tsc.printutility.Util.PrefUtil;
 import com.tsc.printutility.View.fragment.BaseFragment;
 import com.tsc.printutility.View.fragment.CommandFragment;
 import com.tsc.printutility.View.fragment.ConnectFragment;
@@ -25,6 +33,10 @@ import com.tsc.printutility.View.fragment.SettingFragment;
 
 import butterknife.BindView;
 import butterknife.OnClick;
+import rebus.permissionutils.PermissionEnum;
+import rebus.permissionutils.PermissionManager;
+import rebus.permissionutils.PermissionUtils;
+import rebus.permissionutils.SimpleCallback;
 
 public class MainActivity extends BaseActivity {
 
@@ -46,33 +58,31 @@ public class MainActivity extends BaseActivity {
     @BindView(R.id.toolbar_right)
     ImageView mBtnRight;
 
+    private NfcAdapter mNfcAdapter;
+
+    private PendingIntent mPendingIntent;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         super.onCreate(R.layout.activity_main);
         mFragmentManager = getSupportFragmentManager();
 
-        // Create items
+        mNfcAdapter = NfcAdapter.getDefaultAdapter(this);
+
         AHBottomNavigationItem item1 = new AHBottomNavigationItem(R.string.main_tab_setting, R.drawable.icon_setting, android.R.color.white);
         AHBottomNavigationItem item2 = new AHBottomNavigationItem(R.string.main_tab_command, R.drawable.icon_command, android.R.color.white);
         AHBottomNavigationItem item3 = new AHBottomNavigationItem(R.string.main_tab_connect, R.drawable.icon_connect, android.R.color.white);
         AHBottomNavigationItem item4 = new AHBottomNavigationItem(R.string.main_tab_print, R.drawable.icon_printer, android.R.color.white);
 
-// Add items
         mBottomNavigation.addItem(item1);
         mBottomNavigation.addItem(item4);
         mBottomNavigation.addItem(item2);
         mBottomNavigation.addItem(item3);
 
         mBottomNavigation.setDefaultBackgroundColor(getResources().getColor(R.color.color_main));
-
         mBottomNavigation.setAccentColor(Color.YELLOW);
         mBottomNavigation.setInactiveColor(Color.WHITE);
-//        mBottomNavigation.setAccentColor(Color.parseColor("#F63D2B"));
-        mBottomNavigation.setCurrentItem(0);
-
-//        mBottomNavigation.setForceTint(true);
-//        mBottomNavigation.setTranslucentNavigationEnabled(true);
         mBottomNavigation.setTitleState(AHBottomNavigation.TitleState.ALWAYS_SHOW);
 
         mBottomNavigation.setOnTabSelectedListener(new AHBottomNavigation.OnTabSelectedListener() {
@@ -97,12 +107,17 @@ public class MainActivity extends BaseActivity {
             }
         });
 
+        mPendingIntent = PendingIntent.getActivity(this, 0, new Intent(this, getClass()).addFlags(Intent.FLAG_ACTIVITY_SINGLE_TOP), 0);
+        onNewIntent(getIntent());
+
         String webPrintFile = getIntent().getStringExtra(Constant.Extra.FILE_PATH);
+        System.out.println("PrintWebFragment webPrintFile:" + webPrintFile);
         if(webPrintFile != null){
+            mBottomNavigation.setCurrentItem(1);
             gotoFragment(FragmentPage.PAGE_PRINT_WEB);
         }
         else{
-            gotoFragment(FragmentPage.PAGE_SETTING);
+            mBottomNavigation.setCurrentItem(0);
         }
     }
 
@@ -187,5 +202,62 @@ public class MainActivity extends BaseActivity {
         }
     }
 
+    @Override
+    protected void onNewIntent(Intent intent) {
+        super.onNewIntent(intent);
+        setIntent(intent);
+
+        String action = intent.getAction();
+        if(NfcAdapter.ACTION_TAG_DISCOVERED.equals(action)){
+            Tag tagFromIntent = intent.getParcelableExtra(NfcAdapter.EXTRA_TAG);
+            final String address = CommonUtil.byteArrayToHexString(tagFromIntent.getId());
+
+            BluetoothAdapter.getDefaultAdapter().enable();
+            if(!PermissionUtils.isGranted(this, PermissionEnum.ACCESS_COARSE_LOCATION)) {
+                PermissionManager.Builder()
+                        .permission(PermissionEnum.ACCESS_COARSE_LOCATION)
+                        .callback(new SimpleCallback() {
+                            @Override
+                            public void result(boolean allPermissionsGranted) {
+                                if (allPermissionsGranted)
+                                    connectBle(address);
+                            }
+                        })
+                        .ask(this);
+            }
+            else
+                connectBle(address);
+        }
+    }
+
+    private void connectBle(final String address){
+        PrinterController.getInstance(this).connectBlePrinter(address, new PrinterController.OnConnectListener() {
+            @Override
+            public void onConnect(boolean isSuccess) {
+                if(isSuccess) {
+                    PrefUtil.setStringPreference(MainActivity.this, Constant.Pref.LAST_CONNECTED_DEVICE, Constant.DeviceType.BLUETOOTH);
+                    PrefUtil.setStringPreference(MainActivity.this, Constant.Pref.DEVICE_BT_ADDRESS, address);
+                    PrefUtil.setStringPreference(MainActivity.this, Constant.Pref.DEVICE_BT_NAME, "");
+                    Toast.makeText(MainActivity.this, address + " 已連線", Toast.LENGTH_LONG).show();
+                }
+            }
+        });
+    }
+
+    @Override
+    public void onResume() {
+        super.onResume();
+        if(mNfcAdapter != null)
+            mNfcAdapter.enableForegroundDispatch(this, mPendingIntent, null, null);
+    }
+
+    @Override
+    protected void onPause() {
+        super.onPause();
+
+        if (mNfcAdapter != null) {
+            mNfcAdapter.disableForegroundDispatch(this);
+        }
+    }
 }
 

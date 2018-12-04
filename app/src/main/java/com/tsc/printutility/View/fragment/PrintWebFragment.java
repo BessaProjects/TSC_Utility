@@ -2,6 +2,7 @@ package com.tsc.printutility.View.fragment;
 
 import android.annotation.SuppressLint;
 import android.content.Intent;
+import android.graphics.Bitmap;
 import android.graphics.pdf.PdfRenderer;
 import android.os.Bundle;
 import android.os.ParcelFileDescriptor;
@@ -16,6 +17,7 @@ import com.github.chrisbanes.photoview.PhotoView;
 import com.tsc.printutility.Constant;
 import com.tsc.printutility.R;
 import com.tsc.printutility.Util.ImgUtil;
+import com.tsc.printutility.Util.PrefUtil;
 import com.tsc.printutility.View.BaseActivity;
 
 import java.io.File;
@@ -45,9 +47,53 @@ public class PrintWebFragment extends BaseFragment {
         super.onCreateView(inflater, container, R.layout.fragment_print_web);
 
         mFilePath = getArguments().getString(Constant.Extra.FILE_PATH);
+        askForPermission();
+
+        return mView;
+    }
+
+
+    @Override
+    public void onResume(){
+        super.onResume();
+
+        mAdapter = new PhotoPagerAdapter();
+        mPager.setAdapter(mAdapter);
+    }
+
+    public String getFilePath(){
+        return mFilePath;
+    }
+
+    private void askForPermission(){
+        if(!PermissionUtils.isGranted(mContext, PermissionEnum.WRITE_EXTERNAL_STORAGE)) {
+            PermissionManager.Builder()
+                    .permission(PermissionEnum.WRITE_EXTERNAL_STORAGE)
+                    .callback(new SimpleCallback() {
+                        @Override
+                        public void result(boolean allPermissionsGranted) {
+                            if (!allPermissionsGranted)
+                                askForPermission();
+                            else
+                                initialFile();
+                        }
+                    })
+                    .ask(this);
+        }
+        else
+            initialFile();
+    }
+
+    private void initialFile(){
         try {
-            mPdfRenderer = new PdfRenderer(ParcelFileDescriptor.open(new File(mFilePath), ParcelFileDescriptor.MODE_READ_ONLY));
-            mPageCount = mPdfRenderer.getPageCount();
+            File file = new File(mFilePath);
+            if(mFilePath.endsWith(".pdf")) {
+                mPdfRenderer = new PdfRenderer(ParcelFileDescriptor.open(file, ParcelFileDescriptor.MODE_READ_ONLY));
+                mPageCount = mPdfRenderer.getPageCount();
+            }
+            else {
+                mPageCount = 1;
+            }
         }
         catch (Exception ex) {
             ex.printStackTrace();
@@ -76,38 +122,6 @@ public class PrintWebFragment extends BaseFragment {
         mPager.setCurrentItem(selectedIndex);
         mPagerIndex.setText((selectedIndex + 1) + "/" + mPageCount);
         mPager.setPageTransformer(true, new ZoomOutPageTransformer());
-
-        askForPermission();
-
-        return mView;
-    }
-
-
-    @Override
-    public void onResume(){
-        super.onResume();
-
-        mAdapter = new PhotoPagerAdapter();
-        mPager.setAdapter(mAdapter);
-    }
-
-    public String getFilePath(){
-        return mFilePath;
-    }
-
-    private void askForPermission(){
-        if(!PermissionUtils.isGranted(mContext, PermissionEnum.WRITE_EXTERNAL_STORAGE)) {
-            PermissionManager.Builder()
-                    .permission(PermissionEnum.WRITE_EXTERNAL_STORAGE)
-                    .callback(new SimpleCallback() {
-                        @Override
-                        public void result(boolean allPermissionsGranted) {
-                            if (!allPermissionsGranted)
-                                askForPermission();
-                        }
-                    })
-                    .ask(this);
-        }
     }
 
     @OnClick({R.id.photo_view_printer})
@@ -115,7 +129,11 @@ public class PrintWebFragment extends BaseFragment {
         ((BaseActivity)mContext).hideKeyboard();
         switch (view.getId()){
             case R.id.photo_view_printer:
-                ((BaseActivity)mContext).showDevicePicker(mPdfRenderer);
+                if(mPdfRenderer != null)
+                    ((BaseActivity)mContext).showDevicePicker(mPdfRenderer);
+                else
+                    ((BaseActivity)mContext).showDevicePicker(ImgUtil.getBitmapFromPath(mContext, mFilePath, PdfRenderer.Page.RENDER_MODE_FOR_DISPLAY,
+                            PrefUtil.getBooleanPreference(mContext, Constant.Pref.PARAM_IS_RESIZE, Constant.ParamDefault.IS_RESIZE)));
                 break;
         }
     }
@@ -145,7 +163,14 @@ public class PrintWebFragment extends BaseFragment {
             PhotoView photoView = view.findViewById(R.id.photoviewer_photo);
             container.addView(view);
 
-            photoView.setImageBitmap(ImgUtil.getBitmapFromPdf(mContext, mPdfRenderer, position, PdfRenderer.Page.RENDER_MODE_FOR_DISPLAY));
+            boolean isResize = PrefUtil.getBooleanPreference(mContext, Constant.Pref.PARAM_IS_RESIZE, Constant.ParamDefault.IS_RESIZE);
+            if(mPdfRenderer != null) {
+                photoView.setImageBitmap(ImgUtil.getBitmapFromPdf(mContext, mPdfRenderer, position, PdfRenderer.Page.RENDER_MODE_FOR_DISPLAY, isResize));
+            }
+            else{
+                Bitmap res = ImgUtil.getBitmapFromPath(mContext, mFilePath, PdfRenderer.Page.RENDER_MODE_FOR_DISPLAY, isResize);
+                photoView.setImageBitmap(res);
+            }
             return view;
         }
         @Override
@@ -155,8 +180,7 @@ public class PrintWebFragment extends BaseFragment {
 
     }
 
-    public class ZoomOutPageTransformer implements ViewPager.PageTransformer
-    {
+    public class ZoomOutPageTransformer implements ViewPager.PageTransformer{
         private static final float MIN_SCALE = 0.85f;
         private static final float MIN_ALPHA = 0.5f;
         @SuppressLint("NewApi")

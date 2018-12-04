@@ -428,24 +428,34 @@ public class BaseActivity extends AppCompatActivity {
             if(lastConnectedDevice.equals(Constant.DeviceType.WIFI)){
                 if(!PrinterController.getInstance(this).isWifiPrinterConnected()){
                     mConnectIp = PrefUtil.getStringPreference(this, Constant.Pref.DEVICE_WIFI_ADDRESS);
-
-                    mIsConnected = PrinterController.getInstance(this).connectWifiPrinter(mConnectIp);
-                    if(mIsConnected)
-                        Toast.makeText(this, mConnectIp + " is connected.", Toast.LENGTH_LONG).show();
-                    else {
-                        Toast.makeText(this, mConnectIp + " connection failed.", Toast.LENGTH_LONG).show();
-                    }
+                    PrinterController.getInstance(this).connectWifiPrinter(mConnectIp, new PrinterController.OnConnectListener() {
+                        @Override
+                        public void onConnect(boolean isSuccess) {
+                            mIsConnected = isSuccess;
+                            if(mIsConnected)
+                                Toast.makeText(BaseActivity.this, mConnectIp + " is connected.", Toast.LENGTH_LONG).show();
+                            else {
+                                Toast.makeText(BaseActivity.this, mConnectIp + " connection failed.", Toast.LENGTH_LONG).show();
+                            }
+                        }
+                    });
                 }
             }
             else if(lastConnectedDevice.equals(Constant.DeviceType.BLUETOOTH)){
                 if(!PrinterController.getInstance(this).isBlePrinterConnected()){
                     mConnectIp = PrefUtil.getStringPreference(this, Constant.Pref.DEVICE_BT_ADDRESS);
 
-                    mIsConnected = PrinterController.getInstance(this).connectBlePrinter(mConnectIp);
-                    if(mIsConnected)
-                        Toast.makeText(this, mConnectIp + " is connected.", Toast.LENGTH_LONG).show();
-                    else
-                        Toast.makeText(this, mConnectIp + " connection failed.", Toast.LENGTH_LONG).show();
+                    PrinterController.getInstance(this).connectBlePrinter(mConnectIp, new PrinterController.OnConnectListener() {
+                        @Override
+                        public void onConnect(boolean isSuccess) {
+                            mIsConnected = isSuccess;
+                            if(mIsConnected)
+                                Toast.makeText(BaseActivity.this, mConnectIp + " is connected.", Toast.LENGTH_LONG).show();
+                            else
+                                Toast.makeText(BaseActivity.this, mConnectIp + " connection failed.", Toast.LENGTH_LONG).show();
+                        }
+                    });
+
                 }
             }
         }

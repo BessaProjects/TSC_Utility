@@ -38,6 +38,7 @@ public class CropperActivity extends BaseActivity {
         mCropper = findViewById(R.id.cropImageView);
         mBtnRight = findViewById(R.id.toolbar_right);
         mBtnRight.setImageResource(R.drawable.icon_confirm);
+        mBtnRight.setVisibility(View.VISIBLE);
 
         mBtnLeft = findViewById(R.id.toolbar_left);
 
@@ -46,10 +47,15 @@ public class CropperActivity extends BaseActivity {
         mFilePath = getIntent().getStringExtra(Constant.Extra.FILE_PATH);
         int index = getIntent().getIntExtra(Constant.Extra.CROP_INDEX, 0);
         try {
-            PdfRenderer pdfRenderer = new PdfRenderer(ParcelFileDescriptor.open(new File(mFilePath), ParcelFileDescriptor.MODE_READ_ONLY));
-            mSource = ImgUtil.getBitmapFromPdf(this, pdfRenderer, index, PdfRenderer.Page.RENDER_MODE_FOR_DISPLAY, false);
+            if(mFilePath.endsWith(".pdf")) {
+                PdfRenderer pdfRenderer = new PdfRenderer(ParcelFileDescriptor.open(new File(mFilePath), ParcelFileDescriptor.MODE_READ_ONLY));
+                mSource = ImgUtil.getBitmapFromPdf(this, pdfRenderer, index, PdfRenderer.Page.RENDER_MODE_FOR_DISPLAY, false);
+                pdfRenderer.close();
+            }
+            else{
+                mSource = ImgUtil.getBitmapFromPath(this, mFilePath, PdfRenderer.Page.RENDER_MODE_FOR_DISPLAY, false);
+            }
             mCropper.setImageBitmap(mSource);
-            pdfRenderer.close();
         }
         catch (Exception ex) {
             ex.printStackTrace();

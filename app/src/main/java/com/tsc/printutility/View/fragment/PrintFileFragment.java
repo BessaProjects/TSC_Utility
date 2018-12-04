@@ -1,12 +1,9 @@
 package com.tsc.printutility.View.fragment;
 
 import android.app.Activity;
-import android.content.Context;
 import android.content.Intent;
-import android.database.Cursor;
 import android.net.Uri;
 import android.os.Bundle;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -14,10 +11,12 @@ import android.widget.Toast;
 
 import com.tsc.printutility.Constant;
 import com.tsc.printutility.R;
+import com.tsc.printutility.Util.FileUtil;
 import com.tsc.printutility.View.MainActivity;
 import com.tsc.printutility.Widget.DbxChooser;
 
-import java.net.URISyntaxException;
+import java.io.UnsupportedEncodingException;
+import java.net.URLDecoder;
 
 import butterknife.OnClick;
 
@@ -25,7 +24,6 @@ public class PrintFileFragment extends BaseFragment {
 
     private static final int DBX_CHOOSER_REQUEST = 9999;
     private static final int LOCAL_CHOOSER_REQUEST = 9998;
-
 
     private static final String APP_KEY = "jx61xdj0wywf93z";
 
@@ -56,6 +54,7 @@ public class PrintFileFragment extends BaseFragment {
     private void showFileChooser() {
         Intent intent = new Intent(Intent.ACTION_GET_CONTENT);
         intent.setType("*/*");
+        intent.putExtra(Intent.EXTRA_LOCAL_ONLY, true);
         intent.addCategory(Intent.CATEGORY_OPENABLE);
 
         try {
@@ -71,9 +70,14 @@ public class PrintFileFragment extends BaseFragment {
         if (requestCode == DBX_CHOOSER_REQUEST) {
             if (resultCode == Activity.RESULT_OK) {
                 DbxChooser.Result result = new DbxChooser.Result(data);
-                Log.d("main", "Link to selected file: " + result.getLink());
-                String path = result.getLink().toString();
 
+                String path = result.getLink().toString().replaceFirst("file://", "");
+                try {
+                    path = URLDecoder.decode(path,"UTF-8");
+                } catch (UnsupportedEncodingException e) {
+                    e.printStackTrace();
+                }
+                System.out.println("printFile path:" + path);
                 if(path != null && (path.endsWith(".png") || path.endsWith(".jpg") || path.endsWith(".jpeg") || path.endsWith(".pdf"))){
                     Intent i = new Intent(mContext, MainActivity.class);
                     i.putExtra(Constant.Extra.FILE_PATH, path);
@@ -89,25 +93,17 @@ public class PrintFileFragment extends BaseFragment {
         }
         else if(requestCode == LOCAL_CHOOSER_REQUEST){
             if (resultCode == Activity.RESULT_OK) {
-                // Get the Uri of the selected file
                 Uri uri = data.getData();
-                // Get the path
-                String path = null;//这里可能需要加个异常捕捉处理
-                try {
-                    path = getPath(mContext, uri);
-                    Log.d("main", "Link to selected file: " + path);
-                    if(path != null && (path.endsWith(".png") || path.endsWith(".jpg") || path.endsWith(".jpeg") || path.endsWith(".pdf"))){
-                        Intent i = new Intent(mContext, MainActivity.class);
-                        i.putExtra(Constant.Extra.FILE_PATH, path);
-                        startActivity(i);
-                    }
-                    else{
-                        Toast.makeText(mContext, "不支援列印此當按類型", Toast.LENGTH_LONG).show();
-                    }
-                } catch (URISyntaxException e) {
-                    e.printStackTrace();
+                String path = FileUtil.getPath(mContext, uri);
+                System.out.println("printFile path:" + path);
+                if(path != null && (path.endsWith(".png") || path.endsWith(".jpg") || path.endsWith(".jpeg") || path.endsWith(".pdf"))){
+                    Intent i = new Intent(mContext, MainActivity.class);
+                    i.putExtra(Constant.Extra.FILE_PATH, path);
+                    startActivity(i);
                 }
-
+                else{
+                    Toast.makeText(mContext, "不支援列印此當按類型", Toast.LENGTH_LONG).show();
+                }
             }
         }
         else {
@@ -115,26 +111,5 @@ public class PrintFileFragment extends BaseFragment {
         }
     }
 
-    public static String getPath(Context context, Uri uri) throws URISyntaxException {
-        if ("content".equalsIgnoreCase(uri.getScheme())) {
-            String[] projection = { "_data" };
-            Cursor cursor = null;
-
-            try {
-                cursor = context.getContentResolver().query(uri, projection, null, null, null);
-                int column_index = cursor.getColumnIndexOrThrow("_data");
-                if (cursor.moveToFirst()) {
-                    return cursor.getString(column_index);
-                }
-            } catch (Exception e) {
-                // Eat it
-            }
-        }
-        else if ("file".equalsIgnoreCase(uri.getScheme())) {
-            return uri.getPath();
-        }
-
-        return null;
-    }
 
 }

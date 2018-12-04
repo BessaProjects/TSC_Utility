@@ -149,7 +149,7 @@ public class WifiContoller {
                 StrictMode.setThreadPolicy(new StrictMode.ThreadPolicy.Builder()
                         .detectDiskReads()
                         .detectDiskWrites()
-                        .detectNetwork()   // or .detectAll() for all detectable problems
+                        .detectNetwork()
                         .penaltyLog()
                         .build());
 
@@ -217,7 +217,7 @@ public class WifiContoller {
                 singlebyte = new String("" + integer);
             }
             else{
-                integer = (int)udpbyte[44+i];
+                integer = (int)udpbyte[44 + i];
                 singlebyte = new String("" + integer);
             }
 

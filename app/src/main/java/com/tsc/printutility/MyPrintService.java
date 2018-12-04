@@ -76,7 +76,7 @@ public class MyPrintService extends PrintService {
 		public void onStartPrinterDiscovery(List<PrinterId> priorityList) {
 			Log.d(TAG, "onStartPrinterDiscovery()");
 			List<PrinterInfo> printers = this.getPrinters();
-			String name = "Tsc Printer";
+			String name = "Tsc Utility";
 			PrinterInfo myprinter = new PrinterInfo.Builder(myPrintService.generatePrinterId(name), name,
 					PrinterInfo.STATUS_IDLE).build();
 			printers.add(myprinter);

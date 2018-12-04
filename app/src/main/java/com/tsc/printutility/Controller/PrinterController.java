@@ -13,6 +13,7 @@ import com.tsc.printutility.Entity.MediaInfo;
 import com.tsc.printutility.Sqlite.MediaInfoController;
 import com.tsc.printutility.Util.ImgUtil;
 import com.tsc.printutility.Util.PrefUtil;
+import com.tsc.printutility.View.BaseActivity;
 
 import java.util.List;
 
@@ -26,8 +27,14 @@ public class PrinterController {
     private TscWifiActivity mWifi;
     private TSCActivity mBle;
 
+    private Thread mConnectThread;
+
     public interface OnPrintCompletedListener{
         void onCompleted(boolean isSuccess, String message);
+    }
+
+    public interface OnConnectListener{
+        void onConnect(boolean isSuccess);
     }
 
     public static PrinterController getInstance(Context context){
@@ -79,20 +86,42 @@ public class PrinterController {
         }
     }
 
-    public boolean connectBlePrinter(String ipaddress){
-        if(mBle == null)
-            mBle = new TSCActivity();
-        String resultBtOpen = mBle.openport(ipaddress);
-        System.out.println("connectBlePrinter result:" + resultBtOpen);
-        if(resultBtOpen.equals("1"))
-            return true;
-        return false;
+    public void connectBlePrinter(final String ipaddress, final OnConnectListener onConnectListener){
+        if(mConnectThread != null)
+            mConnectThread.interrupt();
+
+        mConnectThread = new Thread(new Runnable() {
+            @Override
+            public void run() {
+                Looper.prepare();
+                if(mBle == null)
+                    mBle = new TSCActivity();
+                final String resultBtOpen = mBle.openport(ipaddress);
+                System.out.println("connectBlePrinter result:" + resultBtOpen);
+
+                ((BaseActivity)mContext).runOnUiThread(new Runnable() {
+                    @Override
+                    public void run() {
+                        if(resultBtOpen.equals("1")) {
+                            onConnectListener.onConnect(true);
+                            return;
+                        }
+                        onConnectListener.onConnect(false);
+                    }
+                });
+            }
+        });
+        mConnectThread.start();
     }
 
     public boolean isBlePrinterConnected(){
-        String result = setupBleParam();
-        if(result.equals("1"))
-            return true;
+        if(mBle != null){
+            String result = mBle.status();
+            if(result.equals("-1"))
+                return false;
+            else
+                return true;
+        }
         return false;
     }
 
@@ -111,7 +140,10 @@ public class PrinterController {
     }
 
     public void print(final Object source, final String ipaddress, final String name, final OnPrintCompletedListener listener){
-        new Thread(new Runnable() {
+        if(mPrintThread != null)
+            mPrintThread.interrupt();
+        
+        mPrintThread = new Thread(new Runnable() {
             @Override
             public void run() {
                 Looper.prepare();
@@ -168,25 +200,45 @@ public class PrinterController {
                     listener.onCompleted(false, "Bluetooth open port failed!");
                 }
             }
-        }).start();
+        });
+        mPrintThread.start();
     }
 
+    public void connectWifiPrinter(final String ipaddress, final OnConnectListener onConnectListener){
+        if(mConnectThread != null)
+            mConnectThread.interrupt();
 
-    public boolean connectWifiPrinter(String ipaddress){
-        if(mWifi == null)
-            mWifi = new TscWifiActivity();
-        String resultBtOpen = mWifi.openport(ipaddress, 9100);
-        System.out.println("connectWifiPrinter result:" + resultBtOpen);
-        if(resultBtOpen.equals("1"))
-            return true;
-        return false;
+        mConnectThread = new Thread(new Runnable() {
+            @Override
+            public void run() {
+                Looper.prepare();
+                if(mWifi == null)
+                    mWifi = new TscWifiActivity();
+                final String resultBtOpen = mWifi.openport(ipaddress, 9100);
+
+                ((BaseActivity)mContext).runOnUiThread(new Runnable() {
+                    @Override
+                    public void run() {
+                        if(resultBtOpen.equals("1")) {
+                            onConnectListener.onConnect(true);
+                            return;
+                        }
+                        onConnectListener.onConnect(false);
+                    }
+                });
+            }
+        });
+        mConnectThread.start();
     }
-
 
     public boolean isWifiPrinterConnected(){
-        String result = setupWifiParam();
-        if(result.equals("1"))
-            return true;
+        if(mWifi != null){
+            String result = mWifi.status();
+            if(result.equals("-1"))
+                return false;
+            else
+                return true;
+        }
         return false;
     }
 
@@ -324,20 +376,26 @@ public class PrinterController {
         }
     }
 
-    public String sendCommand(String command){
-        if(mWifi != null){
-            boolean result = isWifiPrinterConnected();
-            if(result){
-                return mWifi.sendcommand(command);
+    public void sendCommand(final String command, final OnPrintCompletedListener listener){
+        new Thread(new Runnable() {
+            @Override
+            public void run() {
+                String receivedData = "Send command failed !";
+                if(mWifi != null){
+                    boolean result = isWifiPrinterConnected();
+                    if(result){
+                        receivedData = mWifi.sendcommand_getstring(command, 1000);
+                    }
+                }
+                else if(mBle != null){
+                    boolean result = isBlePrinterConnected();
+                    if(result){
+                        receivedData = mBle.sendcommand_getstring(command, 1000);
+                    }
+                }
+                listener.onCompleted(true, receivedData);
             }
-        }
-        else if(mBle != null){
-            boolean result = isBlePrinterConnected();
-            if(result){
-                return mBle.sendcommand(command);
-            }
-        }
-        return "-2";
+        }).start();
     }
 
     public void closeport(){

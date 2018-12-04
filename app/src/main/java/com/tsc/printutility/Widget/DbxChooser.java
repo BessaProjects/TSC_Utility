@@ -67,7 +67,6 @@ public class DbxChooser {
 
     private final String mAppKey;
 
-
     public DbxChooser(String appKey) {
         if (appKey == null || appKey.length() == 0) {
             throw new IllegalArgumentException("An app key must be supplied.");
@@ -309,7 +308,7 @@ public class DbxChooser {
             throw new IllegalStateException("DbxChooser's launch() must be called when there is an Activity available");
         }
         if (!chooserAvailable(thing.getPackageManager())) {
-//            doAppStoreFallback(thing, requestCode);
+            doAppStoreFallback(thing, requestCode);
             return;
         }
 
@@ -329,7 +328,11 @@ public class DbxChooser {
      * Show interstitial, and then app store
      */
     private void doAppStoreFallback(ActivityLike thing, int requestCode) throws ActivityNotFoundException {
-//        AppStoreInterstitial.showInterstitial(thing);
+        try {
+            thing.startActivity(new Intent(Intent.ACTION_VIEW, Uri.parse("market://details?id=com.dropbox.android")));
+        } catch (android.content.ActivityNotFoundException anfe) {
+            thing.startActivity(new Intent(Intent.ACTION_VIEW, Uri.parse("https://play.google.com/store/apps/details?id=com.dropbox.android")));
+        }
     }
 
 
