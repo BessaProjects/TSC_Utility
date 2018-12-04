@@ -6,6 +6,7 @@ import android.content.Intent;
 import android.graphics.Color;
 import android.nfc.NfcAdapter;
 import android.nfc.Tag;
+import android.nfc.tech.MifareUltralight;
 import android.os.Bundle;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentTransaction;
@@ -30,6 +31,8 @@ import com.tsc.printutility.View.fragment.PrintFileFragment;
 import com.tsc.printutility.View.fragment.PrintFragment;
 import com.tsc.printutility.View.fragment.PrintWebFragment;
 import com.tsc.printutility.View.fragment.SettingFragment;
+
+import java.io.IOException;
 
 import butterknife.BindView;
 import butterknife.OnClick;
@@ -210,27 +213,41 @@ public class MainActivity extends BaseActivity {
         String action = intent.getAction();
         if(NfcAdapter.ACTION_TAG_DISCOVERED.equals(action)){
             Tag tagFromIntent = intent.getParcelableExtra(NfcAdapter.EXTRA_TAG);
-            final String address = CommonUtil.byteArrayToHexString(tagFromIntent.getId());
+            MifareUltralight uTag = MifareUltralight.get(tagFromIntent);
+            try {
+                uTag.connect();
+                byte[] data = uTag.readPages(2);
+                byte[] macAddress = new byte[6];
+                for(int i = 0; i < 6; i++){
+                    macAddress[i] = data[i + 8];
+                }
+                uTag.close();
 
-            BluetoothAdapter.getDefaultAdapter().enable();
-            if(!PermissionUtils.isGranted(this, PermissionEnum.ACCESS_COARSE_LOCATION)) {
-                PermissionManager.Builder()
-                        .permission(PermissionEnum.ACCESS_COARSE_LOCATION)
-                        .callback(new SimpleCallback() {
-                            @Override
-                            public void result(boolean allPermissionsGranted) {
-                                if (allPermissionsGranted)
-                                    connectBle(address);
-                            }
-                        })
-                        .ask(this);
+                final String address = CommonUtil.byteArrayToHexString(macAddress);
+                System.out.println("Bluetooth mac address:" + address);
+                if(!PermissionUtils.isGranted(this, PermissionEnum.ACCESS_COARSE_LOCATION)) {
+                    PermissionManager.Builder()
+                            .permission(PermissionEnum.ACCESS_COARSE_LOCATION)
+                            .callback(new SimpleCallback() {
+                                @Override
+                                public void result(boolean allPermissionsGranted) {
+                                    if (allPermissionsGranted)
+                                        connectBle(address);
+                                }
+                            })
+                            .ask(this);
+                }
+                else
+                    connectBle(address);
+
+            } catch (IOException e) {
+                e.printStackTrace();
             }
-            else
-                connectBle(address);
         }
     }
 
     private void connectBle(final String address){
+        BluetoothAdapter.getDefaultAdapter().enable();
         PrinterController.getInstance(this).connectBlePrinter(address, new PrinterController.OnConnectListener() {
             @Override
             public void onConnect(boolean isSuccess) {

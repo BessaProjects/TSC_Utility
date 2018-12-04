@@ -6,6 +6,8 @@ import android.os.Handler;
 import android.os.Message;
 import android.os.StrictMode;
 
+import com.tsc.printutility.Util.CommonUtil;
+
 import java.io.IOException;
 import java.net.DatagramPacket;
 import java.net.DatagramSocket;
@@ -176,6 +178,12 @@ public class WifiContoller {
                     while(true){
                         ds.receive(packet);
                         String ip = getIpAddress(packet.getData());
+
+                        byte[] bb = new byte[6];
+                        for(int i = 22; i < 28; i++){
+                            bb[i - 22] = packet.getData()[i];
+                        }
+                        System.out.println("GETIP: " + CommonUtil.byteArrayToHexString(bb));
 
                         if (!ip.equals("0.0.0.0") && !mIpList.contains(ip)) {
                             System.out.println("ShowIP:" + ip);
