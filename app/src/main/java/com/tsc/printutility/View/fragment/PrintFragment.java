@@ -9,6 +9,10 @@ import com.tsc.printutility.R;
 import com.tsc.printutility.View.MainActivity;
 
 import butterknife.OnClick;
+import rebus.permissionutils.PermissionEnum;
+import rebus.permissionutils.PermissionManager;
+import rebus.permissionutils.PermissionUtils;
+import rebus.permissionutils.SimpleCallback;
 
 public class PrintFragment extends BaseFragment{
 
@@ -25,7 +29,21 @@ public class PrintFragment extends BaseFragment{
                 ((MainActivity)mContext).gotoFragment(MainActivity.FragmentPage.PAGE_PRINT_BARCODE);
                 break;
             case R.id.printmode_file:
-                ((MainActivity)mContext).gotoFragment(MainActivity.FragmentPage.PAGE_PRINT_FILE);
+                if(!PermissionUtils.isGranted(mContext, PermissionEnum.WRITE_EXTERNAL_STORAGE)) {
+                    PermissionManager.Builder()
+                            .permission(PermissionEnum.WRITE_EXTERNAL_STORAGE)
+                            .callback(new SimpleCallback() {
+                                @Override
+                                public void result(boolean allPermissionsGranted) {
+                                    if (allPermissionsGranted)
+                                        ((MainActivity)mContext).gotoFragment(MainActivity.FragmentPage.PAGE_PRINT_FILE);
+                                }
+                            })
+                            .ask(this);
+                }
+                else
+                    ((MainActivity)mContext).gotoFragment(MainActivity.FragmentPage.PAGE_PRINT_FILE);
+
                 break;
             case R.id.printmode_test:
 //                ((MainActivity)mContext).gotoFragment(MainActivity.FragmentPage.PAGE_PRINT_WEB);
