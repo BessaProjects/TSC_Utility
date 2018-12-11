@@ -180,7 +180,7 @@ public class PrinterController {
                             mBle.clearbuffer();
                             Bitmap b = null;
                             if(source instanceof PdfRenderer) {
-                                b = ImgUtil.getBitmapFromPdf(mContext, (PdfRenderer)source, i, PdfRenderer.Page.RENDER_MODE_FOR_PRINT);
+                                b = ImgUtil.getBitmapFromPdf(mContext, (PdfRenderer)source, i, PdfRenderer.Page.RENDER_MODE_FOR_PRINT, false);
                             }
                             else if(source instanceof List<?>){
                                 b = ((List<Bitmap>)source).get(i);
@@ -298,7 +298,7 @@ public class PrinterController {
                             mWifi.clearbuffer();
                             Bitmap b = null;
                             if(source instanceof PdfRenderer) {
-                                b = ImgUtil.getBitmapFromPdf(mContext, (PdfRenderer)source, i, PdfRenderer.Page.RENDER_MODE_FOR_PRINT);
+                                b = ImgUtil.getBitmapFromPdf(mContext, (PdfRenderer)source, i, PdfRenderer.Page.RENDER_MODE_FOR_PRINT, false);
                             }
                             else if(source instanceof List<?>){
                                 b = ((List<Bitmap>)source).get(i);
