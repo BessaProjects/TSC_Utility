@@ -33,6 +33,10 @@ public class PrinterController {
         void onCompleted(boolean isSuccess, String message);
     }
 
+    public interface OnParamReceivedListener{
+        void onReceived(Object message);
+    }
+
     public interface OnConnectListener{
         void onConnect(boolean isSuccess);
     }
@@ -43,33 +47,6 @@ public class PrinterController {
         sInstance.mContext = context;
         return sInstance;
     }
-
-
-//    input label_x,label_y;
-//
-//switch(type){
-//        case 'in':
-//            setup(label_x*25.4,label_y*25.4)
-//
-//            break;
-//        case 'mm':
-//            setup(label_x,label_y)
-//
-//            break;
-//    }
-
-//    input label_x,label_y;
-//    var dpi = 200;
-//switch(type){
-//        case 'in':
-//            setup(label_x*25.4,label_y*25.4)
-//            resize(label_x*dpi,label_y*dpi);
-//            break;
-//        case 'mm':
-//            setup(label_x,label_y)
-//            resize(label_x/25.4*200,label_y/25.4*200);
-//            break;
-//    }
 
     private MediaInfo getMediaInfo(){
         MediaInfoController controller = new MediaInfoController(mContext);
@@ -139,7 +116,7 @@ public class PrinterController {
         return sp;
     }
 
-    public void print(final Object source, final String ipaddress, final String name, final OnPrintCompletedListener listener){
+    public void print(final Object source, final String ipaddress, final OnPrintCompletedListener listener){
         if(mPrintThread != null)
             mPrintThread.interrupt();
         
@@ -157,10 +134,6 @@ public class PrinterController {
                 }
                 System.out.println(TAG + " ble openport result:" + resultBtOpen);
                 if(resultBtOpen.equals("1")) {
-                    PrefUtil.setStringPreference(mContext, Constant.Pref.LAST_CONNECTED_DEVICE, Constant.DeviceType.BLUETOOTH);
-                    PrefUtil.setStringPreference(mContext, Constant.Pref.DEVICE_BT_ADDRESS, ipaddress);
-                    PrefUtil.setStringPreference(mContext, Constant.Pref.DEVICE_BT_NAME, name);
-
                     MediaInfo info = getMediaInfo();
                     boolean isResize = PrefUtil.getBooleanPreference(mContext, Constant.Pref.PARAM_IS_RESIZE, Constant.ParamDefault.IS_RESIZE);
                     float dpi = Constant.ParamDefault.getRealDpi(PrefUtil.getIntegerPreference(mContext, Constant.Pref.PARAM_DPI, Constant.ParamDefault.DPI));
@@ -276,9 +249,6 @@ public class PrinterController {
                 }
                 System.out.println(TAG + " wifi openport result:" + p);
                 if(p.equals("1")) {
-                    PrefUtil.setStringPreference(mContext, Constant.Pref.LAST_CONNECTED_DEVICE, Constant.DeviceType.WIFI);
-                    PrefUtil.setStringPreference(mContext, Constant.Pref.DEVICE_WIFI_ADDRESS, ipaddress);
-
                     MediaInfo info = getMediaInfo();
                     boolean isResize = PrefUtil.getBooleanPreference(mContext, Constant.Pref.PARAM_IS_RESIZE, Constant.ParamDefault.IS_RESIZE);
                     float dpi = Constant.ParamDefault.getRealDpi(PrefUtil.getIntegerPreference(mContext, Constant.Pref.PARAM_DPI, Constant.ParamDefault.DPI));
@@ -313,14 +283,6 @@ public class PrinterController {
                             }
                         }
                     }
-
-//                    wf.closeport(delayTime + 2000);
-//                    try {
-//                        Thread.sleep(delayTime + 2000);
-//                    } catch (InterruptedException e) {
-//                        e.printStackTrace();
-//                    }
-//                    listener.onCompleted(true, null);
                 }
                 else
                     listener.onCompleted(false, ipaddress + ":" + "9100 Open port failed!");
@@ -431,4 +393,77 @@ public class PrinterController {
             }
         }).start();
     }
+
+    /**
+     * @param ipaddress
+     * @param source
+     * @param type
+     * @param listener
+     */
+    public void printBarcode(final String ipaddress, final String source, final String type, final OnPrintCompletedListener listener){
+        if(mPrintThread != null)
+            mPrintThread.interrupt();
+
+        mPrintThread = new Thread(new Runnable() {
+            @Override
+            public void run() {
+                Looper.prepare();
+                String resultBtOpen = "-2";
+
+                MediaInfo info = getMediaInfo();
+
+                if(ipaddress.startsWith("192.168")){
+                    if(!isWifiPrinterConnected()){
+                        mWifi = new TscWifiActivity();
+                        resultBtOpen = mWifi.openport(ipaddress, 9100);
+                    }
+                    else{
+                        resultBtOpen = "1";
+                    }
+                    System.out.println(TAG + " wifi openport result:" + resultBtOpen);
+                }
+                else{
+                    if(!isBlePrinterConnected()) {
+                        mBle = new TSCActivity();
+                        resultBtOpen = mBle.openport(ipaddress);
+                    }
+                    else{
+                        resultBtOpen = "1";
+                    }
+                    System.out.println(TAG + " ble openport result:" + resultBtOpen);
+                }
+
+                if(resultBtOpen.equals("1")) {
+                    if(ipaddress.startsWith("192.168")){
+                        setupWifiParam();
+                        mWifi.barcode(0, 0, type, (int)info.getHeight(), 0,0, 0, 1, source);
+                    }
+                    else{
+                        setupBleParam();
+                        mWifi.barcode(0, 0, type, (int)info.getHeight(), 0,0, 0, 1, source);
+                    }
+                    listener.onCompleted(true, null);
+
+                }
+                else{
+                    listener.onCompleted(false, "Bluetooth open port failed!");
+                }
+            }
+        });
+        mPrintThread.start();
+    }
+
+
+//    public String getDeviceName(OnParamReceivedListener listener){
+//        if(mBle != null) {
+//            System.out.println("Ble disconnect result:" + mBle.closeport(100));
+//            mBle = null;
+//
+//        }
+//
+//        if(mWifi != null) {
+//            System.out.println("Wifi disconnect result:" + mWifi.closeport(100));
+//            mWifi = null;
+//        }
+//    }
 }

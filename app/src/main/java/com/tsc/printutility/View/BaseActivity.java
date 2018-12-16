@@ -10,8 +10,6 @@ import android.support.v4.app.FragmentManager;
 import android.support.v7.app.AppCompatActivity;
 import android.view.View;
 import android.view.inputmethod.InputMethodManager;
-import android.widget.CheckBox;
-import android.widget.TextView;
 import android.widget.Toast;
 
 import com.afollestad.materialdialogs.DialogAction;
@@ -57,39 +55,6 @@ public class BaseActivity extends AppCompatActivity {
 
     public MediaInfo getDefaultMediaInfo(){
         return mDefaultMediaInfo;
-    }
-
-    public void updatePreviewParam(TextView preivew, CheckBox autoResize){
-
-        long currentMediaId = PrefUtil.getLongPreference(this, Constant.Pref.PARAM_MEDIA_ID, -1);
-        if(currentMediaId != -1) {
-            MediaInfo mediaInfo = mMediaInfoController.get(currentMediaId);
-            mWidth = mediaInfo.getWidth();
-            mHeight = mediaInfo.getHeight();
-            mUnit = mediaInfo.getUnit();
-        }
-        else{
-            mWidth = Constant.ParamDefault.WIDTH;
-            mHeight = Constant.ParamDefault.HEIGHT;
-            mUnit = Constant.ParamDefault.UNIT;
-        }
-
-        mIsResize = PrefUtil.getBooleanPreference(this, Constant.Pref.PARAM_IS_RESIZE, Constant.ParamDefault.IS_RESIZE);
-        mDpi = PrefUtil.getIntegerPreference(this, Constant.Pref.PARAM_DPI, Constant.ParamDefault.DPI);
-        autoResize.setChecked(mIsResize);
-
-        if(mIsResize) {
-            if (mUnit == MediaInfo.UNIT_IN)
-                preivew.setText("Auto resize, Width:" + mWidth + "in, Height:" + mHeight + "in\n" + mDpi + "dpi");
-            else
-                preivew.setText("Auto resize, Width:" + mWidth + "mm, Height:" + mHeight + "mm");
-        }
-        else {
-            if (mUnit == MediaInfo.UNIT_IN)
-                preivew.setText("Width:" + mWidth + "in, Height:" + mHeight + "in, " + mDpi + "dpi");
-            else
-                preivew.setText("Width:" + mWidth + "mm, Height:" + mHeight + "mm");
-        }
     }
 
     public interface OnDeviceSelectedListener {
@@ -244,7 +209,6 @@ public class BaseActivity extends AppCompatActivity {
             }
         });
     }
-
     private void scanBleDevice(final Object source){
         showProgress("Discovering...");
         showBleDeviceList(new OnDeviceSelectedListener() {
@@ -257,29 +221,32 @@ public class BaseActivity extends AppCompatActivity {
     }
 
     private void printByBle(final Object source, final String address, final String name){
-        PrinterController.getInstance(BaseActivity.this).print(source, address, name, new PrinterController.OnPrintCompletedListener() {
+        PrinterController.getInstance(BaseActivity.this).print(source, address, new PrinterController.OnPrintCompletedListener() {
             @Override
             public void onCompleted(boolean isSuccess, String message) {
                 dismissProgress();
                 if (isSuccess) {
-                    runOnUiThread(new Runnable() {
-                        @Override
-                        public void run() {
-                            new MaterialDialog.Builder(BaseActivity.this)
-                                    .cancelable(false)
-                                    .content("Disconnect " + name + "\n" + address + "\n資料傳送中,請確認印表機列印完成")
-                                    .positiveText("Disconnect").onPositive(new MaterialDialog.SingleButtonCallback() {
-                                @Override
-                                public void onClick(@NonNull MaterialDialog dialog, @NonNull DialogAction which) {
-                                    PrinterController.getInstance(BaseActivity.this).closeport();
-                                    dialog.dismiss();
-                                }
-                            }).show();
-                        }
-                    });
+                    showDataTransferDialog(name + "\n" + address);
                 }
                 else
                     Toast.makeText(BaseActivity.this, "Something wrong!!", Toast.LENGTH_LONG).show();
+            }
+        });
+    }
+
+    public void showDataTransferDialog(final String address){
+        runOnUiThread(new Runnable() {
+            @Override
+            public void run() {
+                new MaterialDialog.Builder(BaseActivity.this)
+                        .cancelable(false)
+                        .content("Disconnect " + address + "\ndata transferring, please confirm printer is completely printed.")
+                        .positiveText("close").onPositive(new MaterialDialog.SingleButtonCallback() {
+                    @Override
+                    public void onClick(@NonNull MaterialDialog dialog, @NonNull DialogAction which) {
+                        dialog.dismiss();
+                    }
+                }).show();
             }
         });
     }
@@ -301,21 +268,7 @@ public class BaseActivity extends AppCompatActivity {
             public void onCompleted(boolean isSuccess, String message) {
                 dismissProgress();
                 if (isSuccess) {
-                    runOnUiThread(new Runnable() {
-                        @Override
-                        public void run() {
-                            new MaterialDialog.Builder(BaseActivity.this)
-                                    .cancelable(false)
-                                    .content("Disconnect " + address  + "\n資料傳送中,請確認印表機列印完成")
-                                    .positiveText("Disconnect").onPositive(new MaterialDialog.SingleButtonCallback() {
-                                @Override
-                                public void onClick(@NonNull MaterialDialog dialog, @NonNull DialogAction which) {
-                                    PrinterController.getInstance(BaseActivity.this).closeport();
-                                    dialog.dismiss();
-                                }
-                            }).show();
-                        }
-                    });
+                    showDataTransferDialog(address);
                 }
                 else
                     Toast.makeText(BaseActivity.this, "Something wrong!!", Toast.LENGTH_LONG).show();
@@ -326,14 +279,14 @@ public class BaseActivity extends AppCompatActivity {
     public void showDevicePicker(final Object source){
         final String lastConnectedDevice = PrefUtil.getStringPreference(this, Constant.Pref.LAST_CONNECTED_DEVICE);
         final String address;
-        String content = "使用 ";
+        String content = "Using ";
         if(lastConnectedDevice != null && lastConnectedDevice.equals(Constant.DeviceType.WIFI)){
             address = PrefUtil.getStringPreference(this, Constant.Pref.DEVICE_WIFI_ADDRESS);
-            content += address + " 列印";
+            content += address + " to print.";
         }
         else if(lastConnectedDevice != null && lastConnectedDevice.equals(Constant.DeviceType.BLUETOOTH)){
             address = PrefUtil.getStringPreference(this, Constant.Pref.DEVICE_BT_ADDRESS);
-            content += PrefUtil.getStringPreference(this, Constant.Pref.DEVICE_BT_NAME) + " 列印";
+            content += PrefUtil.getStringPreference(this, Constant.Pref.DEVICE_BT_NAME) + " to print.";
         }
         else{
             new MaterialDialog.Builder(BaseActivity.this)
@@ -372,18 +325,6 @@ public class BaseActivity extends AppCompatActivity {
 
         new MaterialDialog.Builder(BaseActivity.this)
                 .content(content)
-                .neutralText("Reset")
-                .onNeutral(new MaterialDialog.SingleButtonCallback() {
-                    @Override
-                    public void onClick(@NonNull MaterialDialog dialog, @NonNull DialogAction which) {
-                        PrefUtil.removePreference(BaseActivity.this, Constant.Pref.LAST_CONNECTED_DEVICE);
-                        PrefUtil.removePreference(BaseActivity.this, Constant.Pref.DEVICE_BT_ADDRESS);
-                        PrefUtil.removePreference(BaseActivity.this, Constant.Pref.DEVICE_BT_NAME);
-                        PrefUtil.removePreference(BaseActivity.this, Constant.Pref.DEVICE_WIFI_ADDRESS);
-                        dialog.dismiss();
-                        showDevicePicker(source);
-                    }
-                })
                 .negativeText("Cancel")
                 .onNegative(new MaterialDialog.SingleButtonCallback() {
                     @Override

@@ -35,7 +35,7 @@ import butterknife.OnClick;
 public class MediaSettingActivity extends AppCompatActivity {
 
 	@BindView(R.id.setting_media_list)
-    RecyclerView mList;
+	RecyclerView mList;
 	@BindView(R.id.toolbar_right)
 	View mBtnRight;
 
@@ -56,7 +56,7 @@ public class MediaSettingActivity extends AppCompatActivity {
 		mList.setLayoutManager(layoutManager);
 		mAdapter = new MediaInfoAdapter(this);
 		mList.setAdapter(mAdapter);
-        mList.addItemDecoration(new LinearLayoutColorDivider(getResources(), android.R.color.darker_gray, 1, LinearLayoutManager.VERTICAL));
+		mList.addItemDecoration(new LinearLayoutColorDivider(getResources(), android.R.color.darker_gray, 1, LinearLayoutManager.VERTICAL));
 
 		mAdapter.setData(mMediaInfoController.getAll());
 		mAdapter.setOnItemClickListener(new View.OnClickListener() {
@@ -66,7 +66,7 @@ public class MediaSettingActivity extends AppCompatActivity {
 			}
 		});
 
-		onNewIntent(getIntent());
+
 	}
 
 	@OnClick({R.id.toolbar_left, R.id.setting_delete, R.id.setting_edit, R.id.setting_new})
@@ -98,7 +98,7 @@ public class MediaSettingActivity extends AppCompatActivity {
 
 				}
 				else
-					Toast.makeText(this, "請選擇一個Media",  Toast.LENGTH_LONG).show();
+					Toast.makeText(this, "Please pick a Media.",  Toast.LENGTH_LONG).show();
 				break;
 			case R.id.setting_edit:
 				if(info != null) {
@@ -110,7 +110,7 @@ public class MediaSettingActivity extends AppCompatActivity {
 					});
 				}
 				else
-					Toast.makeText(this, "請選擇一個Media",  Toast.LENGTH_LONG).show();
+					Toast.makeText(this, "Please pick a Media.",  Toast.LENGTH_LONG).show();
 				break;
 			case R.id.setting_new:
 				showMediaEditor(null, new DialogInterface.OnDismissListener() {
@@ -131,9 +131,6 @@ public class MediaSettingActivity extends AppCompatActivity {
 		if(mediaInfo == null){
 			mediaInfo = new MediaInfo();
 			mediaInfo.setId(-1);
-			mediaInfo.setName("New Media");
-			mediaInfo.setWidth(Constant.ParamDefault.WIDTH);
-			mediaInfo.setHeight(Constant.ParamDefault.HEIGHT);
 			mediaInfo.setUnit(MediaInfo.UNIT_IN);
 		}
 
@@ -190,11 +187,11 @@ public class MediaSettingActivity extends AppCompatActivity {
 				MediaInfo info = (MediaInfo) view.getTag();
 
 				if(editName.getText().length() == 0 || editWidth.getText().length() == 0 || editHeight.getText().length() == 0) {
-					Toast.makeText(MediaSettingActivity.this, "欄位不可為空", Toast.LENGTH_LONG).show();
+					Toast.makeText(MediaSettingActivity.this, "Name, width and height cannot be empty!", Toast.LENGTH_LONG).show();
 					return;
 				}
 				if(Double.parseDouble(editWidth.getText().toString()) == 0 || Double.parseDouble(editHeight.getText().toString()) == 0){
-					Toast.makeText(MediaSettingActivity.this, "欄位不可為０", Toast.LENGTH_LONG).show();
+					Toast.makeText(MediaSettingActivity.this, "Width and height cannot be 0.", Toast.LENGTH_LONG).show();
 					return;
 				}
 

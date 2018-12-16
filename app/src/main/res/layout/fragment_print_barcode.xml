@@ -44,7 +44,7 @@
                 style="@style/style_edittext_mediainfo_title"
                 android:text="Print Type" />
 
-            <EditText
+            <TextView
                 android:id="@+id/print_barcode_type"
                 style="@style/style_edittext_mediainfo_title"
                 android:layout_marginLeft="5dp"
