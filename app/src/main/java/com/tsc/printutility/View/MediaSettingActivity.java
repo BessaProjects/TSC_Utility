@@ -14,6 +14,7 @@ import android.view.View;
 import android.widget.CompoundButton;
 import android.widget.EditText;
 import android.widget.RadioButton;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import com.afollestad.materialdialogs.DialogAction;
@@ -38,6 +39,8 @@ public class MediaSettingActivity extends AppCompatActivity {
 	RecyclerView mList;
 	@BindView(R.id.toolbar_right)
 	View mBtnRight;
+	@BindView(R.id.toolbar_title)
+	TextView mTitle;
 
 	private MediaInfoController mMediaInfoController;
 	private MediaInfoAdapter mAdapter;
@@ -48,6 +51,7 @@ public class MediaSettingActivity extends AppCompatActivity {
 		setContentView(R.layout.activity_setting);
 		ButterKnife.bind(this);
 		mBtnRight.setVisibility(View.GONE);
+		mTitle.setText("Media List");
 
 		mMediaInfoController = new MediaInfoController(this);
 
@@ -65,8 +69,6 @@ public class MediaSettingActivity extends AppCompatActivity {
 				PrefUtil.setLongPreference(MediaSettingActivity.this, Constant.Pref.PARAM_MEDIA_ID, ((MediaInfo)view.getTag()).getId());
 			}
 		});
-
-
 	}
 
 	@OnClick({R.id.toolbar_left, R.id.setting_delete, R.id.setting_edit, R.id.setting_new})
@@ -79,9 +81,9 @@ public class MediaSettingActivity extends AppCompatActivity {
 			case R.id.setting_delete:
 				if(info != null) {
 					new MaterialDialog.Builder(this)
-							.title("Delete")
-							.content("Are you sure delete \"" + info.getName() + "\"")
-							.positiveText("Ok").onPositive(new MaterialDialog.SingleButtonCallback() {
+							.title(R.string.delete)
+							.content(getString(R.string.media_delete_check, info.getName()))
+							.positiveText(R.string.general_ok).onPositive(new MaterialDialog.SingleButtonCallback() {
 						@Override
 						public void onClick(@NonNull MaterialDialog dialog, @NonNull DialogAction which) {
 							dialog.dismiss();
@@ -89,7 +91,7 @@ public class MediaSettingActivity extends AppCompatActivity {
 							mMediaInfoController.delete(info.getId());
 							mAdapter.setData(mMediaInfoController.getAll());
 						}
-					}).negativeText("Cancel").onNegative(new MaterialDialog.SingleButtonCallback() {
+					}).negativeText(R.string.cancel).onNegative(new MaterialDialog.SingleButtonCallback() {
 						@Override
 						public void onClick(@NonNull MaterialDialog dialog, @NonNull DialogAction which) {
 							dialog.dismiss();
@@ -98,7 +100,7 @@ public class MediaSettingActivity extends AppCompatActivity {
 
 				}
 				else
-					Toast.makeText(this, "Please pick a Media.",  Toast.LENGTH_LONG).show();
+					Toast.makeText(this, R.string.media_pick_alert,  Toast.LENGTH_LONG).show();
 				break;
 			case R.id.setting_edit:
 				if(info != null) {
@@ -110,7 +112,7 @@ public class MediaSettingActivity extends AppCompatActivity {
 					});
 				}
 				else
-					Toast.makeText(this, "Please pick a Media.",  Toast.LENGTH_LONG).show();
+					Toast.makeText(this, R.string.media_pick_alert,  Toast.LENGTH_LONG).show();
 				break;
 			case R.id.setting_new:
 				showMediaEditor(null, new DialogInterface.OnDismissListener() {
@@ -132,6 +134,7 @@ public class MediaSettingActivity extends AppCompatActivity {
 			mediaInfo = new MediaInfo();
 			mediaInfo.setId(-1);
 			mediaInfo.setUnit(MediaInfo.UNIT_IN);
+			mediaInfo.setSensorType(MediaInfo.SENSOR_TYPE_GAP);
 		}
 
 		final View view = LayoutInflater.from(this).inflate(R.layout.dialog_mediainfo_editor, null);
@@ -140,6 +143,8 @@ public class MediaSettingActivity extends AppCompatActivity {
 		final EditText editHeight = view.findViewById(R.id.mediainfo_editor_height);
 		final RadioButton unitIn = view.findViewById(R.id.mediainfo_editor_unit_in);
 		final RadioButton unitMm = view.findViewById(R.id.mediainfo_editor_unit_mm);
+		final RadioButton typeGap = view.findViewById(R.id.mediainfo_editor_type_gap);
+		final RadioButton typeBlack = view.findViewById(R.id.mediainfo_editor_type_black);
 		view.setTag(mediaInfo);
 
 		if(mediaInfo != null){
@@ -154,7 +159,34 @@ public class MediaSettingActivity extends AppCompatActivity {
 				unitIn.setChecked(false);
 				unitMm.setChecked(true);
 			}
+
+			if(mediaInfo.getSensorType().equals(MediaInfo.SENSOR_TYPE_GAP)){
+				typeGap.setChecked(true);
+				typeBlack.setChecked(false);
+			}
+			else{
+				typeGap.setChecked(false);
+				typeBlack.setChecked(true);
+			}
 		}
+
+		typeGap.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
+			@Override
+			public void onCheckedChanged(CompoundButton compoundButton, boolean b) {
+				if(b){
+					typeBlack.setChecked(false);
+				}
+			}
+		});
+
+		typeBlack.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
+			@Override
+			public void onCheckedChanged(CompoundButton compoundButton, boolean b) {
+				if(b){
+					typeGap.setChecked(false);
+				}
+			}
+		});
 
 		unitIn.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
 			@Override
@@ -187,17 +219,23 @@ public class MediaSettingActivity extends AppCompatActivity {
 				MediaInfo info = (MediaInfo) view.getTag();
 
 				if(editName.getText().length() == 0 || editWidth.getText().length() == 0 || editHeight.getText().length() == 0) {
-					Toast.makeText(MediaSettingActivity.this, "Name, width and height cannot be empty!", Toast.LENGTH_LONG).show();
+					Toast.makeText(MediaSettingActivity.this, R.string.media_field_cannot_empty, Toast.LENGTH_LONG).show();
 					return;
 				}
 				if(Double.parseDouble(editWidth.getText().toString()) == 0 || Double.parseDouble(editHeight.getText().toString()) == 0){
-					Toast.makeText(MediaSettingActivity.this, "Width and height cannot be 0.", Toast.LENGTH_LONG).show();
+					Toast.makeText(MediaSettingActivity.this, R.string.media_size_cannot_zero, Toast.LENGTH_LONG).show();
 					return;
 				}
 
 				info.setName(editName.getText() + "");
 				info.setWidth(Double.parseDouble(editWidth.getText().toString()));
 				info.setHeight(Double.parseDouble(editHeight.getText().toString()));
+
+				if(typeGap.isChecked())
+					info.setSensorType(MediaInfo.SENSOR_TYPE_GAP);
+				else
+					info.setSensorType(MediaInfo.SENSOR_TYPE_BLACK);
+
 				info.setUpdateTime(getDateTime(System.currentTimeMillis()));
 				if(unitMm.isChecked())
 					info.setUnit(MediaInfo.UNIT_MM);

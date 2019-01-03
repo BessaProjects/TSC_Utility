@@ -21,6 +21,7 @@ import com.tsc.printutility.Controller.PrinterController;
 import com.tsc.printutility.Controller.WifiContoller;
 import com.tsc.printutility.Entity.MediaInfo;
 import com.tsc.printutility.Sqlite.MediaInfoController;
+import com.tsc.printutility.Util.DeviceUtil;
 import com.tsc.printutility.Util.PrefUtil;
 
 import java.util.ArrayList;
@@ -42,10 +43,10 @@ public class BaseActivity extends AppCompatActivity {
     public int  mUnit, mDpi;
     public boolean mIsResize;
     protected MediaInfoController mMediaInfoController;
-    private MediaInfo mDefaultMediaInfo;
+    public MediaInfo mDefaultMediaInfo;
 
-    private boolean mIsConnected = false;
-    private String mConnectIp = "";
+    public boolean mIsConnected = false;
+    public String mConnectIp = "";
 
     protected void onCreate(int layout) {
         setContentView(layout);
@@ -358,48 +359,8 @@ public class BaseActivity extends AppCompatActivity {
     @Override
     public void onResume(){
         super.onResume();
-        long currentMediaId = PrefUtil.getLongPreference(this, Constant.Pref.PARAM_MEDIA_ID, -1);
-        if(currentMediaId != -1 && mMediaInfoController != null) {
-            mDefaultMediaInfo = mMediaInfoController.get(currentMediaId);
-        }
 
-        String lastConnectedDevice = PrefUtil.getStringPreference(this, Constant.Pref.LAST_CONNECTED_DEVICE);
-        System.out.println(lastConnectedDevice);
-        if(lastConnectedDevice != null){
-            if(lastConnectedDevice.equals(Constant.DeviceType.WIFI)){
-                if(!PrinterController.getInstance(this).isWifiPrinterConnected()){
-                    mConnectIp = PrefUtil.getStringPreference(this, Constant.Pref.DEVICE_WIFI_ADDRESS);
-                    PrinterController.getInstance(this).connectWifiPrinter(mConnectIp, new PrinterController.OnConnectListener() {
-                        @Override
-                        public void onConnect(boolean isSuccess) {
-                            mIsConnected = isSuccess;
-                            if(mIsConnected)
-                                Toast.makeText(BaseActivity.this, mConnectIp + " is connected.", Toast.LENGTH_LONG).show();
-                            else {
-                                Toast.makeText(BaseActivity.this, mConnectIp + " connection failed.", Toast.LENGTH_LONG).show();
-                            }
-                        }
-                    });
-                }
-            }
-            else if(lastConnectedDevice.equals(Constant.DeviceType.BLUETOOTH)){
-                if(!PrinterController.getInstance(this).isBlePrinterConnected()){
-                    mConnectIp = PrefUtil.getStringPreference(this, Constant.Pref.DEVICE_BT_ADDRESS);
 
-                    PrinterController.getInstance(this).connectBlePrinter(mConnectIp, new PrinterController.OnConnectListener() {
-                        @Override
-                        public void onConnect(boolean isSuccess) {
-                            mIsConnected = isSuccess;
-                            if(mIsConnected)
-                                Toast.makeText(BaseActivity.this, mConnectIp + " is connected.", Toast.LENGTH_LONG).show();
-                            else
-                                Toast.makeText(BaseActivity.this, mConnectIp + " connection failed.", Toast.LENGTH_LONG).show();
-                        }
-                    });
-
-                }
-            }
-        }
     }
 
     public void setConnect(boolean connect){
@@ -423,7 +384,10 @@ public class BaseActivity extends AppCompatActivity {
     @Override
     public void onStop(){
         super.onStop();
-        PrinterController.getInstance(this).closeport();
+        if(!DeviceUtil.getTopActivityPackageName(this).equals(getPackageName())) {
+            mIsConnected = false;
+            PrinterController.getInstance(this).closeport();
+        }
     }
 
     public void hideKeyboard() {

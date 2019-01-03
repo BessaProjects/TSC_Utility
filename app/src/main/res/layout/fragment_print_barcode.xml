@@ -70,9 +70,14 @@
         </LinearLayout>
     </LinearLayout>
 
+    <View
+        style="@style/style_horizontal_divider_black"/>
+
+    <View
+        style="@style/style_horizontal_divider_black"
+        android:layout_marginTop="15dp"/>
     <TextView
         style="@style/style_title"
-        android:layout_marginTop="15dp"
         android:text="Media info"/>
 
     <LinearLayout
@@ -121,6 +126,8 @@
 
         </LinearLayout>
 
+        <View
+            style="@style/style_horizontal_divider_black"/>
     </LinearLayout>
 
     <RelativeLayout
@@ -133,6 +140,9 @@
             android:layout_height="wrap_content"
             android:layout_alignParentBottom="true"
             android:background="@android:color/white">
+
+            <View
+                style="@style/style_horizontal_divider_black"/>
 
             <LinearLayout
                 android:layout_width="wrap_content"

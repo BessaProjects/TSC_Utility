@@ -9,6 +9,8 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Toast;
 
+import com.aditya.filebrowser.Constants;
+import com.aditya.filebrowser.FileChooser;
 import com.tsc.printutility.Constant;
 import com.tsc.printutility.R;
 import com.tsc.printutility.Util.FileUtil;
@@ -52,17 +54,21 @@ public class PrintFileFragment extends BaseFragment {
     }
 
     private void showFileChooser() {
-        Intent intent = new Intent(Intent.ACTION_GET_CONTENT);
-        intent.setType("*/*");
-        intent.putExtra(Intent.EXTRA_LOCAL_ONLY, true);
-        intent.addCategory(Intent.CATEGORY_OPENABLE);
+//        Intent intent = new Intent(Intent.ACTION_OPEN_DOCUMENT);
+//        intent.setType("*/*");
+//        intent.putExtra(Intent.EXTRA_LOCAL_ONLY, true);
+//        intent.addCategory(Intent.CATEGORY_OPENABLE);
 
-        try {
-            startActivityForResult(Intent.createChooser(intent, "Select a File to Upload"), LOCAL_CHOOSER_REQUEST);
-        } catch (android.content.ActivityNotFoundException ex) {
-            // Potentially direct the user to the Market with a Dialog
-            Toast.makeText(mContext, "Please install a File Manager.",  Toast.LENGTH_SHORT).show();
-        }
+        Intent i2 = new Intent(mContext, FileChooser.class);
+        i2.putExtra(Constants.SELECTION_MODE,Constants.SELECTION_MODES.SINGLE_SELECTION.ordinal());
+        startActivityForResult(i2, LOCAL_CHOOSER_REQUEST);
+
+//        try {
+//            startActivityForResult(Intent.createChooser(intent, "Select a File to Upload"), LOCAL_CHOOSER_REQUEST);
+//        } catch (android.content.ActivityNotFoundException ex) {
+//            // Potentially direct the user to the Market with a Dialog
+//            Toast.makeText(mContext, "Please install a File Manager.",  Toast.LENGTH_SHORT).show();
+//        }
     }
 
     @Override
@@ -94,6 +100,7 @@ public class PrintFileFragment extends BaseFragment {
         else if(requestCode == LOCAL_CHOOSER_REQUEST){
             if (resultCode == Activity.RESULT_OK) {
                 Uri uri = data.getData();
+                System.out.println("printFile path uri:" + uri + ", " + uri.getPath());
                 String path = FileUtil.getPath(mContext, uri);
                 System.out.println("printFile path:" + path);
                 if(path != null && (path.endsWith(".png") || path.endsWith(".jpg") || path.endsWith(".jpeg") || path.endsWith(".pdf"))){

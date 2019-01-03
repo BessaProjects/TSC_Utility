@@ -28,8 +28,7 @@
 
                     <TextView
                         android:id="@+id/setting_name"
-                        style="@style/style_info_content"
-                        android:text="Device" />
+                        style="@style/style_info_content"/>
 
                 </LinearLayout>
 
@@ -43,8 +42,7 @@
 
                     <TextView
                         android:id="@+id/setting_label_width"
-                        style="@style/style_info_content"
-                        android:text="Device" />
+                        style="@style/style_info_content"/>
 
                 </LinearLayout>
 
@@ -58,8 +56,7 @@
 
                     <TextView
                         android:id="@+id/setting_label_height"
-                        style="@style/style_info_content"
-                        android:text="Device" />
+                        style="@style/style_info_content"/>
 
                 </LinearLayout>
 
@@ -73,8 +70,7 @@
 
                     <TextView
                         android:id="@+id/setting_speed"
-                        style="@style/style_info_content"
-                        android:text="Device" />
+                        style="@style/style_info_content" />
 
                 </LinearLayout>
 
@@ -88,8 +84,7 @@
 
                     <TextView
                         android:id="@+id/setting_density"
-                        style="@style/style_info_content"
-                        android:text="Device" />
+                        style="@style/style_info_content"/>
 
                 </LinearLayout>
 
@@ -103,8 +98,7 @@
 
                     <TextView
                         android:id="@+id/setting_sensor_type"
-                        style="@style/style_info_content"
-                        android:text="GAP" />
+                        style="@style/style_info_content" />
 
                 </LinearLayout>
 
@@ -148,7 +142,8 @@
                 android:id="@+id/setting_sensor_type_set"
                 style="@style/style_info_parent"
                 android:layout_marginTop="1dp"
-                android:background="@android:color/white">
+                android:background="@android:color/white"
+                android:visibility="gone">
 
                 <ImageView style="@style/style_info_icon"
                     android:src="@drawable/icon_speed"

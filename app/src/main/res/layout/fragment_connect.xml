@@ -84,8 +84,7 @@
 
             <TextView
                 android:id="@+id/connect_device"
-                style="@style/style_info_content"
-                android:text="TX200" />
+                style="@style/style_info_content"/>
 
         </LinearLayout>
 
@@ -97,8 +96,7 @@
 
             <TextView
                 android:id="@+id/connect_address"
-                style="@style/style_info_content"
-                android:text="00-00-00-00" />
+                style="@style/style_info_content" />
 
         </LinearLayout>
 
@@ -111,8 +109,7 @@
 
             <TextView
                 android:id="@+id/connect_battery"
-                style="@style/style_info_content"
-                android:text="40%" />
+                style="@style/style_info_content"/>
 
         </LinearLayout>
 

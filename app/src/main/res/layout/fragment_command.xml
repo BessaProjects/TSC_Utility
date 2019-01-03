@@ -26,9 +26,15 @@
 
     </ScrollView>
 
+    <View
+        style="@style/style_horizontal_divider_black"/>
+
+    <View
+        style="@style/style_horizontal_divider_black"
+        android:layout_marginTop="5dp"/>
+
     <TextView
         style="@style/style_title"
-        android:layout_marginTop="5dp"
         android:text="Received data" />
 
     <ScrollView
@@ -47,6 +53,13 @@
             android:padding="10dp"/>
     </ScrollView>
 
+    <View
+        style="@style/style_horizontal_divider_black"/>
+
+    <View
+        style="@style/style_horizontal_divider_black"
+        android:layout_marginTop="5dp"/>
+
     <EditText
         android:id="@+id/command_input"
         android:layout_width="match_parent"
@@ -55,8 +68,14 @@
         android:hint="Input command"
         android:textColor="@android:color/black"
         android:textSize="16sp"
-        android:layout_marginTop="5dp"
         android:background="@android:color/white"/>
+
+    <View
+        style="@style/style_horizontal_divider_black"/>
+
+    <View
+        style="@style/style_horizontal_divider_black"
+        android:layout_marginTop="5dp"/>
 
     <TextView
         android:id="@+id/command_send"
@@ -65,7 +84,6 @@
         android:textColor="@color/color_blue_btn_txt"
         android:textSize="18sp"
         android:padding="10dp"
-        android:layout_marginTop="5dp"
         android:background="@android:color/white"
         android:layout_gravity="center"
         android:gravity="center"

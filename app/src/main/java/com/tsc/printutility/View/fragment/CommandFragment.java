@@ -9,6 +9,7 @@ import android.widget.TextView;
 
 import com.tsc.printutility.Controller.PrinterController;
 import com.tsc.printutility.R;
+import com.tsc.printutility.View.BaseActivity;
 
 import butterknife.BindView;
 import butterknife.OnClick;
@@ -25,6 +26,7 @@ public class CommandFragment extends BaseFragment{
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         super.onCreateView(inflater, container, R.layout.fragment_command);
+//        mInput.setText(PrinterController.COMMAND_BATTERY);
         return mView;
     }
 
@@ -33,10 +35,12 @@ public class CommandFragment extends BaseFragment{
         switch (view.getId()){
             case R.id.command_send:
                 mSendData.append(mInput.getText() + "\n");
-
+                ((BaseActivity)mContext).showProgress(null);
                 PrinterController.getInstance(mContext).sendCommand(mInput.getText() + "", new PrinterController.OnPrintCompletedListener() {
                     @Override
                     public void onCompleted(boolean isSuccess, String message) {
+                        ((BaseActivity)mContext).dismissProgress();
+                        mInput.setText("");
                         mReceivedData.append(message + "\n");
                     }
                 });

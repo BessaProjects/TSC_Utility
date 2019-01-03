@@ -9,7 +9,7 @@ public class TscSqliteHelper extends SQLiteOpenHelper {
     // 資料庫名稱
     public static final String DATABASE_NAME = "TscMedia.db";
     // 資料庫版本，資料結構改變的時候要更改這個數字，通常是加一
-    public static final int VERSION = 1;
+    public static final int VERSION = 2;
     // 資料庫物件，固定的欄位變數
     private static SQLiteDatabase database;
 
@@ -41,6 +41,7 @@ public class TscSqliteHelper extends SQLiteOpenHelper {
         // 待會再回來完成它
 
         // 呼叫onCreate建立新版的表格
+        db.execSQL("DROP TABLE IF EXISTS " + MediaInfoController.TABLE_NAME);
         onCreate(db);
     }
 

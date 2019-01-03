@@ -1,35 +1,53 @@
 <resources>
-    <string name="app_name">Print Utility</string>
+    <string name="app_name">TSC Mobile Utility</string>
 
     <string name="main_tab_setting">Setting</string>
     <string name="main_tab_command">Command</string>
     <string name="main_tab_connect">Connect</string>
     <string name="main_tab_print">Print</string>
 
-
     <string name="general_edit">Edit</string>
+    <string name="general_new">New</string>
     <string name="general_upload">Upload</string>
     <string name="general_leave">Leave</string>
     <string name="general_delete">Delete</string>
+    <string name="general_refresh">Refresh</string>
 
-    <string name="general_choose_image">Pick album</string>
-    <string name="general_choose_camera">Pick Camera</string>
-    <string name="general_url">Url</string>
-    <string name="general_camera">Camera</string>
-    <string name="general_image">Album</string>
-    <string name="general_ok">Ok</string>
-    <string name="general_go">Go</string>
     <string name="general_cancel">Cancel</string>
     <string name="general_confirm">Confirm</string>
-    <string name="general_reset">Reset</string>
-    <string name="general_apply">Apply</string>
-    <string name="general_optional">Optional</string>
+    <string name="general_ok">OK</string>
+    <string name="general_alert">Alert</string>
+    <string name="general_go">Go</string>
+
+    <string name="general_connect">Connect</string>
     <string name="general_disconnect">Disconnect</string>
-    <string name="general_personal_info">Personal Info</string>
-    <string name="general_anyone_can_see">Anyone can see</string>
-    <string name="general_report_improper_use">Report improper use</string>
-    <string name="general_age_range">Age range</string>
-    <string name="general_unavailable">Unavailable</string>
+    <string name="general_something_wrong">Something wrong!!</string>
+
+    <string name="alert_disconnect_ble">Disconnect %1$s \n%2$s\ndata transferring, please confirm printer is completely printed.</string>
+    <string name="alert_disconnect_wifi">Disconnect %s \ndata transferring, please confirm printer is completely printed.</string>
+    <string name="alert_is_connected">%s is connected.</string>
+    <string name="alert_connection_failed">%s connection failed.</string>
+    <string name="alert_remove_record_check">Are you sure to delete auto record?</string>
+    <string name="alert_record_removed">Connection record has been deleted.</string>
+    <string name="alert_device_cannot_find">Cannot find any device.</string>
+
+    <string name="device_param_in_resize">Auto resize, Width: %1$s in, Height: %2$s in\n %3$s dpi</string>
+    <string name="device_param_in">Width: %1$s in, Height: %2$s in\n %3$s dpi</string>
+    <string name="device_param_mm_resize">Auto resize, Width: %1$s mm, Height: %2$s mm</string>
+    <string name="device_param_mm">Width: %1$s mm, Height: %2$s mm\n</string>
+
+    <string name="device_discovering">Discovering...</string>
+    <string name="device_printing">Printing</string>
+    <string name="device_using_to_print">Using %s to print.</string>
+    <string name="device_oom">Out Of Memory error</string>
+    <string name="device_ble_open_failed">Bluetooth open port failed!</string>
+    <string name="device_wifi_open_failed">:9100 Open port failed!</string>
+
+    <string name="media_delete_check">Are you sure delete %s</string>
+    <string name="media_pick_alert">Please pick a Media.</string>
+    <string name="media_field_cannot_empty">Name, width and height cannot be empty!</string>
+    <string name="media_size_cannot_zero">Width and height cannot be 0.</string>
+
 
     <string-array name="barcode_print_type_list">
         <item>128</item>
@@ -56,5 +74,9 @@
         <item>UPCE+5</item>
     </string-array>
 
+    <string-array name="printer_sensor_type_list">
+        <item>gap</item>
+        <item>black</item>
+    </string-array>
 </resources>
 

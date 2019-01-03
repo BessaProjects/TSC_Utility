@@ -11,10 +11,10 @@ import android.widget.SeekBar;
 import android.widget.TextView;
 
 import com.tsc.printutility.Constant;
-import com.tsc.printutility.Entity.MediaInfo;
+import com.tsc.printutility.Controller.PrinterController;
+import com.tsc.printutility.Entity.DeviceInfo;
 import com.tsc.printutility.R;
 import com.tsc.printutility.Util.PrefUtil;
-import com.tsc.printutility.View.BaseActivity;
 import com.tsc.printutility.View.MediaSettingActivity;
 
 import butterknife.BindView;
@@ -39,27 +39,50 @@ public class SettingFragment extends BaseFragment {
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         super.onCreateView(inflater, container, R.layout.fragment_setting);
 
+        DeviceInfo info = PrinterController.getInstance(mContext).getDeviceInfo();
+        if(info != null && info.getName() != null && info.getName().length() > 0) {
+            mName.setText(info.getName());
+            mWidth.setText(info.getWidth() + " px");
+            mHeight.setText(info.getHeight() + " px");
+            mDensity.setText(info.getDensity() + "");
+            mSpeed.setText(info.getSpeed() + "");
+            mSensorType.setText(info.getSensor());
+        }
+        else {
+            PrinterController.getInstance(mContext).addOnConnectListener(getClass().getSimpleName(), new PrinterController.OnConnectListener() {
+                @Override
+                public void onConnect(boolean isSuccess) {
+                    DeviceInfo info = PrinterController.getInstance(mContext).getDeviceInfo();
+                    mName.setText(info.getName());
+                    mWidth.setText(info.getWidth() + " px");
+                    mHeight.setText(info.getHeight() + " px");
+                    mDensity.setText(info.getDensity() + "");
+                    mSpeed.setText(info.getSpeed() + "");
+                    mSensorType.setText(info.getSensor());
+                }
+            });
+        }
         return mView;
     }
 
     @Override
     public void onResume(){
         super.onResume();
-        MediaInfo info = ((BaseActivity)mContext).getDefaultMediaInfo();
-        if(info != null){
-            if(info.getUnit() == MediaInfo.UNIT_IN) {
-                mWidth.setText(info.getWidth() + "in");
-                mHeight.setText(info.getHeight() + "in");
-            }
-            else{
-                mWidth.setText(info.getWidth() + "mm");
-                mHeight.setText(info.getHeight() + "mm");
-            }
-
-        }
-
-        mDensity.setText(PrefUtil.getIntegerPreference(mContext, Constant.Pref.PARAM_DENSITY, Constant.ParamDefault.DENSITY) + "");
-        mSpeed.setText(PrefUtil.getIntegerPreference(mContext, Constant.Pref.PARAM_SPEED, Constant.ParamDefault.SPEED) + "");
+//        MediaInfo info = ((BaseActivity)mContext).getDefaultMediaInfo();
+//        if(info != null){
+//            if(info.getUnit() == MediaInfo.UNIT_IN) {
+//                mWidth.setText(info.getWidth() + " in");
+//                mHeight.setText(info.getHeight() + " in");
+//            }
+//            else{
+//                mWidth.setText(info.getWidth() + " mm");
+//                mHeight.setText(info.getHeight() + " mm");
+//            }
+//            mSensorType.setText(info.getSensorType());
+//        }
+//
+//        mDensity.setText(PrefUtil.getIntegerPreference(mContext, Constant.Pref.PARAM_DENSITY, Constant.ParamDefault.DENSITY) + "");
+//        mSpeed.setText(PrefUtil.getIntegerPreference(mContext, Constant.Pref.PARAM_SPEED, Constant.ParamDefault.SPEED) + "");
     }
 
     @OnClick({R.id.setting_speed_set, R.id.setting_media_size_set, R.id.setting_sensor_type_set, R.id.setting_density_set})
@@ -78,8 +101,8 @@ public class SettingFragment extends BaseFragment {
                 Intent i = new Intent(mContext, MediaSettingActivity.class);
                 startActivity(i);
                 break;
-            case R.id.setting_sensor_type_set:
-                break;
+//            case R.id.setting_sensor_type_set:
+//                break;
             case R.id.setting_density_set:
                 showSeekbarDialog("Density", 15, PrefUtil.getIntegerPreference(mContext, Constant.Pref.PARAM_DENSITY, Constant.ParamDefault.DENSITY), new View.OnClickListener() {
                     @Override

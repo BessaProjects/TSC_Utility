@@ -26,19 +26,37 @@ public class ConnectFragment extends BaseFragment{
     View mConnect;
     @BindView(R.id.connect_disconnect)
     View mDisconnect;
+    @BindView(R.id.connect_device)
+    TextView mDevice;
     @BindView(R.id.connect_address)
     TextView mAddress;
+    @BindView(R.id.connect_battery)
+    TextView mBattery;
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         super.onCreateView(inflater, container, R.layout.fragment_connect);
+
+        String battery = PrinterController.getInstance(mContext).getDeviceInfo().getBattery();
+        if(battery != null) {
+            mBattery.setText(battery + "%");
+            mDevice.setText(PrinterController.getInstance(mContext).getDeviceInfo().getName());
+        }
+        else {
+            PrinterController.getInstance(mContext).addOnConnectListener(getClass().getSimpleName(), new PrinterController.OnConnectListener() {
+                @Override
+                public void onConnect(boolean isSuccess) {
+                    mBattery.setText(PrinterController.getInstance(mContext).getDeviceInfo().getBattery() + "%");
+                    mDevice.setText(PrinterController.getInstance(mContext).getDeviceInfo().getName());
+                }
+            });
+        }
         return mView;
     }
 
     @Override
     public void onResume(){
         super.onResume();
-
         updateUI();
     }
 
@@ -46,7 +64,7 @@ public class ConnectFragment extends BaseFragment{
     public void onClick(View view){
         switch (view.getId()){
             case R.id.connect_wifi:
-                ((BaseActivity)mContext).showProgress("Discovering...");
+                ((BaseActivity)mContext).showProgress(mContext.getString(R.string.device_discovering));
                 ((BaseActivity)mContext).showIpDeviceList(new BaseActivity.OnDeviceSelectedListener() {
                     @Override
                     public void onSelected(String name, final String address) {
@@ -86,7 +104,7 @@ public class ConnectFragment extends BaseFragment{
                 PrefUtil.removePreference(mContext, Constant.Pref.DEVICE_BT_ADDRESS);
                 PrefUtil.removePreference(mContext, Constant.Pref.DEVICE_BT_NAME);
                 PrefUtil.removePreference(mContext, Constant.Pref.DEVICE_WIFI_ADDRESS);
-                Toast.makeText(mContext, "已清除連線紀錄", Toast.LENGTH_LONG).show();
+                Toast.makeText(mContext, R.string.alert_record_removed, Toast.LENGTH_LONG).show();
                 break;
             case R.id.connect_disconnect_action:
                 PrinterController.getInstance(mContext).closeport(new PrinterController.OnPrintCompletedListener() {
@@ -103,7 +121,7 @@ public class ConnectFragment extends BaseFragment{
     }
 
     private void connectBle(){
-        ((BaseActivity)mContext).showProgress("Discovering...");
+        ((BaseActivity)mContext).showProgress(mContext.getString(R.string.device_discovering));
         ((BaseActivity)mContext).showBleDeviceList(new BaseActivity.OnDeviceSelectedListener() {
             @Override
             public void onSelected(String name, final String address) {

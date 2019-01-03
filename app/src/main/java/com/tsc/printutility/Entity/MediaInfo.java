@@ -5,11 +5,14 @@ public class MediaInfo {
     public final static int UNIT_IN = 0;
     public final static int UNIT_MM = 1;
 
+    public final static String SENSOR_TYPE_GAP = "gap";
+    public final static String SENSOR_TYPE_BLACK = "black";
     long id;
     String name;
     double width;
     double height;
     int unit;
+    String sensorType;
     String updateTime;
 
     public long getId() {
@@ -58,5 +61,13 @@ public class MediaInfo {
 
     public void setUpdateTime(String updateTime) {
         this.updateTime = updateTime;
+    }
+
+    public String getSensorType() {
+        return sensorType;
+    }
+
+    public void setSensorType(String sensorType) {
+        this.sensorType = sensorType;
     }
 }

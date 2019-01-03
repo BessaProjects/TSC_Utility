@@ -33,6 +33,7 @@
             android:layout_height="wrap_content"
             android:orientation="vertical"
             android:padding="10dp">
+
             <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
@@ -40,7 +41,7 @@
 
                 <TextView
                     style="@style/style_text_mediainfo_title"
-                    android:text="name" />
+                    android:text="Name" />
 
                 <EditText
                     android:id="@+id/mediainfo_editor_name"
@@ -57,7 +58,7 @@
 
                 <TextView
                     style="@style/style_text_mediainfo_title"
-                    android:text="width" />
+                    android:text="Width" />
 
                 <EditText
                     android:id="@+id/mediainfo_editor_width"
@@ -74,7 +75,7 @@
 
                 <TextView
                     style="@style/style_text_mediainfo_title"
-                    android:text="height" />
+                    android:text="Height" />
 
                 <EditText
                     android:id="@+id/mediainfo_editor_height"
@@ -88,27 +89,63 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="10dp"
-                android:layout_marginLeft="20dp"
-                android:layout_marginRight="20dp"
                 android:orientation="horizontal">
 
-                <RadioButton
-                    android:id="@+id/mediainfo_editor_unit_in"
+                <TextView
                     style="@style/style_text_mediainfo_title"
-                    android:text="in"/>
+                    android:text="Sensor Type" />
 
-                <RadioButton
-                    android:id="@+id/mediainfo_editor_unit_mm"
+                <LinearLayout
+                    style="@style/style_edittext_mediainfo_title"
+                    android:background="@android:color/transparent"
+                    android:orientation="horizontal">
+
+                    <RadioButton
+                        android:id="@+id/mediainfo_editor_type_gap"
+                        style="@style/style_text_mediainfo_title"
+                        android:text="gap" />
+
+                    <RadioButton
+                        android:id="@+id/mediainfo_editor_type_black"
+                        style="@style/style_text_mediainfo_title"
+                        android:text="black" />
+
+                </LinearLayout>
+            </LinearLayout>
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="10dp"
+                android:orientation="horizontal">
+
+                <TextView
                     style="@style/style_text_mediainfo_title"
-                    android:text="mm"/>
+                    android:text="Unit" />
 
+                <LinearLayout
+                    style="@style/style_edittext_mediainfo_title"
+                    android:background="@android:color/transparent"
+                    android:orientation="horizontal">
+
+                    <RadioButton
+                        android:id="@+id/mediainfo_editor_unit_in"
+                        style="@style/style_text_mediainfo_title"
+                        android:text="in" />
+
+                    <RadioButton
+                        android:id="@+id/mediainfo_editor_unit_mm"
+                        style="@style/style_text_mediainfo_title"
+                        android:text="mm" />
+
+                </LinearLayout>
             </LinearLayout>
         </LinearLayout>
 
         <View
             android:layout_width="match_parent"
             android:layout_height="1dp"
-            android:background="#D0D0D0"/>
+            android:background="#D0D0D0" />
 
         <LinearLayout
             android:layout_width="match_parent"
@@ -141,7 +178,7 @@
                 android:layout_weight="1"
                 android:background="@drawable/selector_btn_corner_bot_right"
                 android:gravity="center"
-                android:text="@string/general_confirm"
+                android:text="@string/general_ok"
                 android:textColor="@color/color_blue_btn_txt"
                 android:textSize="18dp" />
         </LinearLayout>

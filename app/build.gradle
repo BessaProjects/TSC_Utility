@@ -72,6 +72,8 @@ dependencies {
 
     implementation 'com.aurelhubert:ahbottomnavigation:2.1.0'
 
+    implementation 'com.adityak:browsemyfiles:1.7'
+
 }
 
 def releaseTime() {

@@ -50,6 +50,7 @@ public class Constant {
         public final static String DEVICE_BT_ADDRESS = "DEVICE_BT_ADDRESS";
         public final static String DEVICE_WIFI_ADDRESS = "DEVICE_WIFI_ADDRESS";
         public final static String DEVICE_WIFI_PORT = "DEVICE_WIFI_PORT";
+        public final static String CONNECTED_DEVICE_NAME = "CONNECTED_DEVICE_NAME";
 
         public final static String PARAM_WIDTH = "PARAM_WIDTH";
         public final static String PARAM_HEIGHT = "PARAM_HEIGHT";

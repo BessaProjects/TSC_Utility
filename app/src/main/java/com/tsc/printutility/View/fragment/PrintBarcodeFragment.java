@@ -13,7 +13,7 @@ import com.afollestad.materialdialogs.DialogAction;
 import com.afollestad.materialdialogs.MaterialDialog;
 import com.tsc.printutility.Constant;
 import com.tsc.printutility.Controller.PrinterController;
-import com.tsc.printutility.Entity.MediaInfo;
+import com.tsc.printutility.Entity.DeviceInfo;
 import com.tsc.printutility.R;
 import com.tsc.printutility.Util.PrefUtil;
 import com.tsc.printutility.View.BaseActivity;
@@ -42,19 +42,30 @@ public class PrintBarcodeFragment extends BaseFragment {
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         super.onCreateView(inflater, container, R.layout.fragment_print_barcode);
-
         return mView;
     }
 
     @Override
     public void onResume(){
         super.onResume();
-        MediaInfo mediaInfo = ((BaseActivity)mContext).getDefaultMediaInfo();
-        if(mediaInfo != null){
-            mWidth.setText(mediaInfo.getWidth() + "");
-            mHeight.setText(mediaInfo.getHeight() + "");
-            mMediaSze.setText(mediaInfo.getName());
-        }
+//        MediaInfo info = ((BaseActivity)mContext).getDefaultMediaInfo();
+//        if(info != null){
+//            mMediaSze.setText(info.getName());
+//            if(info.getUnit() == MediaInfo.UNIT_IN) {
+//                mWidth.setText(info.getWidth() + " in");
+//                mHeight.setText(info.getHeight() + " in");
+//            }
+//            else{
+//                mWidth.setText(info.getWidth() + " mm");
+//                mHeight.setText(info.getHeight() + " mm");
+//            }
+//            mSensorType.setText(info.getSensorType());
+//        }
+
+        DeviceInfo info = PrinterController.getInstance(mContext).getDeviceInfo();
+        mWidth.setText(info.getWidth() + " px");
+        mHeight.setText(info.getHeight() + " px");
+        mSensorType.setText(info.getSensor());
     }
 
     @OnClick({R.id.print_barcode_action, R.id.print_barcode_media_size, R.id.print_barcode_type})

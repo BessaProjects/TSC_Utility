@@ -22,6 +22,7 @@ public class MediaInfoController {
     public static final String COLUMN_NAME = "name";
     public static final String COLUMN_WIDTH = "width";
     public static final String COLUMN_HEIGHT = "height";
+    public static final String COLUMN_SENSOR_TYPE = "sensorType";
     public static final String COLUMN_UNIT = "unit";
     public static final String COLUMN_UPDATE_TIME = "updateTime";
 
@@ -33,6 +34,7 @@ public class MediaInfoController {
                     COLUMN_WIDTH + " DOUBLE NOT NULL, " +
                     COLUMN_HEIGHT + " DOUBLE NOT NULL, " +
                     COLUMN_UNIT + " INTEGER NOT NULL, " +
+                    COLUMN_SENSOR_TYPE + " TEXT NOT NULL, " +
                     COLUMN_UPDATE_TIME + " TEXT)";
 
     // 資料庫物件
@@ -58,6 +60,7 @@ public class MediaInfoController {
         cv.put(COLUMN_NAME, item.getName());
         cv.put(COLUMN_WIDTH, item.getWidth());
         cv.put(COLUMN_HEIGHT, item.getHeight());
+        cv.put(COLUMN_SENSOR_TYPE, item.getSensorType());
         cv.put(COLUMN_UNIT, item.getUnit());
         cv.put(COLUMN_UPDATE_TIME, item.getUpdateTime());
 
@@ -84,6 +87,7 @@ public class MediaInfoController {
         cv.put(COLUMN_NAME, item.getName());
         cv.put(COLUMN_WIDTH, item.getWidth());
         cv.put(COLUMN_HEIGHT, item.getHeight());
+        cv.put(COLUMN_SENSOR_TYPE, item.getSensorType());
         cv.put(COLUMN_UNIT, item.getUnit());
         cv.put(COLUMN_UPDATE_TIME, item.getUpdateTime());
 
@@ -149,7 +153,8 @@ public class MediaInfoController {
         result.setWidth(cursor.getDouble(2));
         result.setHeight(cursor.getDouble(3));
         result.setUnit(cursor.getInt(4));
-        result.setUpdateTime(cursor.getString(5));
+        result.setSensorType(cursor.getString(5));
+        result.setUpdateTime(cursor.getString(6));
 
         // 回傳結果
         return result;

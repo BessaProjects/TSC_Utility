@@ -74,8 +74,10 @@ public class FileUtil {
                 final String id = DocumentsContract.getDocumentId(uri);
                 System.out.println("printFile:" + id);
                 try{
-                    final Uri contentUri = ContentUris.withAppendedId(
-                            Uri.parse("content://downloads/public_downloads"), Long.valueOf(id));
+                    Uri contentUri = uri;
+//                    if (Build.VERSION.SDK_INT < Build.VERSION_CODES.O)
+                        contentUri = ContentUris.withAppendedId(Uri.parse("content://downloads/public_downloads"), Long.valueOf(id));
+
                     return getDataColumn(context, contentUri, null, null);
                 }
                 catch (NumberFormatException e){
@@ -134,7 +136,7 @@ public class FileUtil {
                                        String[] selectionArgs) {
 
         Cursor cursor = null;
-        final String column = "_data";
+        final String column = MediaStore.Images.Media.DATA;
         final String[] projection = {
                 column
         };
@@ -146,11 +148,43 @@ public class FileUtil {
                 final int column_index = cursor.getColumnIndexOrThrow(column);
                 return cursor.getString(column_index);
             }
-        } finally {
+        }
+        catch (Exception e){
+
+        }
+        finally {
             if (cursor != null)
                 cursor.close();
         }
         return null;
+    }
+
+    public String getData(Context context, Uri uri){
+        // Will return "image:x*"
+        String wholeID = DocumentsContract.getDocumentId(uri);
+
+// Split at colon, use second item in the array
+        String id = wholeID.split(":")[1];
+
+        String[] column = { MediaStore.Images.Media.DATA };
+
+// where id is equal to
+        String sel = MediaStore.Images.Media._ID + "=?";
+
+        Cursor cursor = context.getContentResolver().
+                query(MediaStore.Images.Media.EXTERNAL_CONTENT_URI,
+                        column, sel, new String[]{ id }, null);
+
+        String filePath = "";
+
+        int columnIndex = cursor.getColumnIndex(column[0]);
+
+        if (cursor.moveToFirst()) {
+            filePath = cursor.getString(columnIndex);
+        }
+
+        cursor.close();
+        return filePath;
     }
 
 

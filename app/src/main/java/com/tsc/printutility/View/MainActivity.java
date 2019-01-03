@@ -91,20 +91,22 @@ public class MainActivity extends BaseActivity {
         mBottomNavigation.setOnTabSelectedListener(new AHBottomNavigation.OnTabSelectedListener() {
             @Override
             public boolean onTabSelected(int position, boolean wasSelected) {
-                switch (position){
-                    case 0:
-                        gotoFragment(FragmentPage.PAGE_SETTING);
-                        break;
-                    case 1:
-                        gotoFragment(FragmentPage.PAGE_PRINT);
-                        break;
-                    case 2:
-                        gotoFragment(FragmentPage.PAGE_COMMAND);
-                        break;
-                    case 3:
-                        gotoFragment(FragmentPage.PAGE_CONNECT);
-                        break;
+                if(isConnected()) {
+                    switch (position) {
+                        case 0:
+                            gotoFragment(FragmentPage.PAGE_SETTING);
+                            break;
+                        case 1:
+                            gotoFragment(FragmentPage.PAGE_PRINT);
+                            break;
+                        case 2:
+                            gotoFragment(FragmentPage.PAGE_COMMAND);
+                            break;
+                        case 3:
+                            gotoFragment(FragmentPage.PAGE_CONNECT);
+                            break;
 
+                    }
                 }
                 return true;
             }
@@ -113,14 +115,16 @@ public class MainActivity extends BaseActivity {
         mPendingIntent = PendingIntent.getActivity(this, 0, new Intent(this, getClass()).addFlags(Intent.FLAG_ACTIVITY_SINGLE_TOP), 0);
         onNewIntent(getIntent());
 
-        String webPrintFile = getIntent().getStringExtra(Constant.Extra.FILE_PATH);
-        System.out.println("PrintWebFragment webPrintFile:" + webPrintFile);
-        if(webPrintFile != null){
-            mBottomNavigation.setCurrentItem(1);
-            gotoFragment(FragmentPage.PAGE_PRINT_WEB);
-        }
-        else{
-            mBottomNavigation.setCurrentItem(0);
+        String deviceName = PrinterController.getInstance(MainActivity.this).getDeviceInfo().getName();
+        if(deviceName != null)
+            mName.setText(deviceName);
+        else {
+            PrinterController.getInstance(this).addOnConnectListener(getClass().getSimpleName(), new PrinterController.OnConnectListener() {
+                @Override
+                public void onConnect(boolean isSuccess) {
+                    mName.setText(PrinterController.getInstance(MainActivity.this).getDeviceInfo().getName());
+                }
+            });
         }
     }
 
@@ -128,27 +132,34 @@ public class MainActivity extends BaseActivity {
         hideKeyboard();
         switch (page){
             case PAGE_SETTING:
+                mBottomNavigation.setCurrentItem(0);
                 mCurrentFragment = new SettingFragment();
                 break;
             case PAGE_COMMAND:
+                mBottomNavigation.setCurrentItem(2);
                 mCurrentFragment = new CommandFragment();
                 break;
             case PAGE_CONNECT:
+                mBottomNavigation.setCurrentItem(3);
                 mCurrentFragment = new ConnectFragment();
                 break;
             case PAGE_PRINT:
+                mBottomNavigation.setCurrentItem(1);
                 mCurrentFragment = new PrintFragment();
                 break;
             case PAGE_PRINT_BARCODE:
+                mBottomNavigation.setCurrentItem(1);
                 mCurrentFragment = new PrintBarcodeFragment();
                 break;
             case PAGE_PRINT_WEB:
+                mBottomNavigation.setCurrentItem(1);
                 mCurrentFragment = new PrintWebFragment();
                 Bundle bundle = new Bundle();
                 bundle.putString(Constant.Extra.FILE_PATH, getIntent().getStringExtra(Constant.Extra.FILE_PATH));
                 mCurrentFragment.setArguments(bundle);
                 break;
             case PAGE_PRINT_FILE:
+                mBottomNavigation.setCurrentItem(1);
                 mCurrentFragment = new PrintFileFragment();
                 break;
         }
@@ -210,6 +221,8 @@ public class MainActivity extends BaseActivity {
         super.onNewIntent(intent);
         setIntent(intent);
 
+        System.out.println("onNewIntent:" + intent + ", " + getIntent().getStringExtra(Constant.Extra.FILE_PATH));
+
         String action = intent.getAction();
         if(NfcAdapter.ACTION_TAG_DISCOVERED.equals(action)){
             Tag tagFromIntent = intent.getParcelableExtra(NfcAdapter.EXTRA_TAG);
@@ -244,6 +257,11 @@ public class MainActivity extends BaseActivity {
                 e.printStackTrace();
             }
         }
+
+        String webPrintFile = getIntent().getStringExtra(Constant.Extra.FILE_PATH);
+        if(webPrintFile != null){
+            gotoFragment(FragmentPage.PAGE_PRINT_WEB);
+        }
     }
 
     private void connectBle(final String address){
@@ -266,6 +284,63 @@ public class MainActivity extends BaseActivity {
         super.onResume();
         if(mNfcAdapter != null)
             mNfcAdapter.enableForegroundDispatch(this, mPendingIntent, null, null);
+
+        if(!mIsConnected){
+            long currentMediaId = PrefUtil.getLongPreference(this, Constant.Pref.PARAM_MEDIA_ID, -1);
+            if(currentMediaId != -1 && mMediaInfoController != null) {
+                mDefaultMediaInfo = mMediaInfoController.get(currentMediaId);
+            }
+
+            String lastConnectedDevice = PrefUtil.getStringPreference(this, Constant.Pref.LAST_CONNECTED_DEVICE);
+            System.out.println(lastConnectedDevice);
+            if(lastConnectedDevice != null){
+                if(lastConnectedDevice.equals(Constant.DeviceType.WIFI)){
+                    PrinterController.getInstance(this).isWifiPrinterConnectedThread(new PrinterController.OnConnectListener() {
+                        @Override
+                        public void onConnect(boolean isSuccess) {
+                            if(!isSuccess) {
+                                mConnectIp = PrefUtil.getStringPreference(MainActivity.this, Constant.Pref.DEVICE_WIFI_ADDRESS);
+                                PrinterController.getInstance(MainActivity.this).connectWifiPrinter(mConnectIp, new PrinterController.OnConnectListener() {
+                                    @Override
+                                    public void onConnect(boolean isSuccess) {
+                                        mIsConnected = isSuccess;
+                                        if (mIsConnected)
+                                            Toast.makeText(MainActivity.this, getString(R.string.alert_is_connected, mConnectIp), Toast.LENGTH_LONG).show();
+                                        else {
+                                            Toast.makeText(MainActivity.this, getString(R.string.alert_connection_failed, mConnectIp), Toast.LENGTH_LONG).show();
+                                            gotoFragment(FragmentPage.PAGE_CONNECT);
+                                        }
+                                    }
+                                });
+                            }
+                        }
+                    });
+                }
+                else if(lastConnectedDevice.equals(Constant.DeviceType.BLUETOOTH)){
+                    if(!PrinterController.getInstance(this).isBlePrinterConnected()){
+                        mConnectIp = PrefUtil.getStringPreference(this, Constant.Pref.DEVICE_BT_ADDRESS);
+
+                        BluetoothAdapter.getDefaultAdapter().enable();
+                        PrinterController.getInstance(this).connectBlePrinter(mConnectIp, new PrinterController.OnConnectListener() {
+                            @Override
+                            public void onConnect(boolean isSuccess) {
+                                mIsConnected = isSuccess;
+                                if(mIsConnected)
+                                    Toast.makeText(MainActivity.this, getString(R.string.alert_is_connected, mConnectIp), Toast.LENGTH_LONG).show();
+                                else {
+                                    Toast.makeText(MainActivity.this, getString(R.string.alert_connection_failed, mConnectIp), Toast.LENGTH_LONG).show();
+                                    gotoFragment(FragmentPage.PAGE_CONNECT);
+                                }
+                            }
+                        });
+
+                    }
+                }
+            }
+            else {
+                gotoFragment(FragmentPage.PAGE_CONNECT);
+            }
+        }
     }
 
     @Override

@@ -95,4 +95,8 @@
         <item name="android:layout_gravity">center</item>
         <item name="android:layout_marginRight">10dp</item>
     </style>
+
+    <style name="style_horizontal_divider_black" parent="style_horizontal_divider">
+        <item name="android:background">#343434</item>
+    </style>
 </resources>
