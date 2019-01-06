@@ -119,8 +119,8 @@ public class PrinterController {
                             requestDeviceInfo();
                             return;
                         }
-                        onConnectListener.onConnect(false);
                         ((BaseActivity)mContext).dismissProgress();
+                        onConnectListener.onConnect(false);
                     }
                 });
             }
@@ -142,15 +142,50 @@ public class PrinterController {
     private String setupBleParam(){
         MediaInfo info = getMediaInfo();
 
+        int speed = PrefUtil.getIntegerPreference(mContext, Constant.Pref.PARAM_SPEED, Constant.ParamDefault.SPEED);
+        int density = PrefUtil.getIntegerPreference(mContext, Constant.Pref.PARAM_DENSITY, Constant.ParamDefault.DENSITY);
         String sp = "-2";
         if(mBle != null) {
             if (info.getUnit() == MediaInfo.UNIT_IN)
-                sp = mBle.setup((int) (info.getWidth() * 25.4f), (int) (info.getHeight() * 25.4f), 4, 4, 0, 0, 0);
+                sp = mBle.setup((int) (info.getWidth() * 25.4f), (int) (info.getHeight() * 25.4f), speed, density, 0, 0, 0);
             else
-                sp = mBle.setup((int) info.getWidth(), (int) info.getHeight(), 4, 4, 0, 0, 0);
+                sp = mBle.setup((int) info.getWidth(), (int) info.getHeight(), speed, density, 0, 0, 0);
         }
         System.out.println(TAG + " ble setup result:" + sp);
         return sp;
+    }
+
+    public void setup(final OnPrintCompletedListener listener){
+        new Thread(new Runnable() {
+            @Override
+            public void run() {
+                Looper.prepare();
+                if(setupBleParam().equals("1")) {
+                    ((Activity)mContext).runOnUiThread(new Runnable() {
+                        @Override
+                        public void run() {
+                            listener.onCompleted(true, null);
+                        }
+                    });
+                }
+                else if(setupWifiParam().equals("1")){
+                    ((Activity)mContext).runOnUiThread(new Runnable() {
+                        @Override
+                        public void run() {
+                            listener.onCompleted(true, null);
+                        }
+                    });
+                }
+                else{
+                    ((Activity)mContext).runOnUiThread(new Runnable() {
+                        @Override
+                        public void run() {
+                            listener.onCompleted(false, null);
+                        }
+                    });
+                }
+            }
+        }).start();
     }
 
     public void print(final Object source, final String ipaddress, final OnPrintCompletedListener listener){
@@ -175,7 +210,6 @@ public class PrinterController {
                     boolean isResize = PrefUtil.getBooleanPreference(mContext, Constant.Pref.PARAM_IS_RESIZE, Constant.ParamDefault.IS_RESIZE);
                     float dpi = Constant.ParamDefault.getRealDpi(PrefUtil.getIntegerPreference(mContext, Constant.Pref.PARAM_DPI, Constant.ParamDefault.DPI));
 
-                    setupBleParam();
                     int count = 0;
                     if(source instanceof PdfRenderer) {
                         count = ((PdfRenderer)source).getPageCount();
@@ -183,6 +217,9 @@ public class PrinterController {
                     else if(source instanceof List<?>){
                         count = ((List<Bitmap>)source).size();
                     }
+                    else if(source instanceof Bitmap)
+                        count = 1;
+
                     if(count != 0){
                         for(int i = 0; i < count; i++) {
                             mBle.clearbuffer();
@@ -193,6 +230,8 @@ public class PrinterController {
                             else if(source instanceof List<?>){
                                 b = ((List<Bitmap>)source).get(i);
                             }
+                            else if(source instanceof Bitmap)
+                                b = (Bitmap) source;
                             if(b != null) {
                                 String res = sendBimap(mBle, b, info, dpi, isResize);
                                 System.out.println(TAG + " ble sendBitmap at index " + i + ", result:" + res);
@@ -280,17 +319,20 @@ public class PrinterController {
         }).start();
     }
 
-    private String setupWifiParam(){
+    public String setupWifiParam(){
         MediaInfo info = getMediaInfo();
+
+        int speed = PrefUtil.getIntegerPreference(mContext, Constant.Pref.PARAM_SPEED, Constant.ParamDefault.SPEED);
+        int density = PrefUtil.getIntegerPreference(mContext, Constant.Pref.PARAM_DENSITY, Constant.ParamDefault.DENSITY);
 
         String sp = "-2";
         if(mWifi != null) {
             if (info.getUnit() == MediaInfo.UNIT_IN)
-                sp = mWifi.setup((int) (info.getWidth() * 25.4f), (int) (info.getHeight() * 25.4f), 4, 4, 0, 0, 0);
+                sp = mWifi.setup((int) (info.getWidth() * 25.4f), (int) (info.getHeight() * 25.4f), speed, density, 0, 0, 0);
             else
-                sp = mWifi.setup((int) info.getWidth(), (int) info.getHeight(), 4, 4, 0, 0, 0);
+                sp = mWifi.setup((int) info.getWidth(), (int) info.getHeight(), speed, density, 0, 0, 0);
         }
-        System.out.println(TAG + " Wifi setup result:" + sp);
+        System.out.println(TAG + " Wifi setup result:" + sp + ", " + speed + ", " + density);
         return sp;
     }
 
@@ -316,7 +358,6 @@ public class PrinterController {
                     boolean isResize = PrefUtil.getBooleanPreference(mContext, Constant.Pref.PARAM_IS_RESIZE, Constant.ParamDefault.IS_RESIZE);
                     float dpi = Constant.ParamDefault.getRealDpi(PrefUtil.getIntegerPreference(mContext, Constant.Pref.PARAM_DPI, Constant.ParamDefault.DPI));
 
-                    setupWifiParam();
                     int count = 0;
                     if(source instanceof PdfRenderer) {
                         count = ((PdfRenderer)source).getPageCount();
@@ -324,6 +365,8 @@ public class PrinterController {
                     else if(source instanceof List<?>){
                         count = ((List<Bitmap>)source).size();
                     }
+                    else if(source instanceof Bitmap)
+                        count = 1;
                     if(count != 0){
                         for(int i = 0; i < count; i++) {
                             mWifi.clearbuffer();
@@ -334,6 +377,8 @@ public class PrinterController {
                             else if(source instanceof List<?>){
                                 b = ((List<Bitmap>)source).get(i);
                             }
+                            else if(source instanceof Bitmap)
+                                b = (Bitmap) source;
                             if(b != null) {
                                 String res = sendBimap(mWifi, b, info, dpi, isResize);
                                 System.out.println(TAG + " wifi sendBitmap at index " + i + ", result:" + res);
@@ -406,23 +451,23 @@ public class PrinterController {
                 int count = 0;
                 System.out.println("requestDeviceInfo ble:" + mBle);
                 if(mWifi != null){
-                    while (!isWifiPrinterConnected()){
-                        try {
-                            Thread.sleep(200);
-                        } catch (InterruptedException e) {
-                            e.printStackTrace();
-                        }
-                        if(count > 10) {
-                            ((Activity)mContext).runOnUiThread(new Runnable() {
-                                @Override
-                                public void run() {
-                                    listener.onCompleted(true, "Send command failed");
-                                }
-                            });
-                            return;
-                        }
-                        count ++;
-                    }
+//                    while (!isWifiPrinterConnected()){
+//                        try {
+//                            Thread.sleep(200);
+//                        } catch (InterruptedException e) {
+//                            e.printStackTrace();
+//                        }
+//                        if(count > 10) {
+//                            ((Activity)mContext).runOnUiThread(new Runnable() {
+//                                @Override
+//                                public void run() {
+//                                    listener.onCompleted(true, "Send command failed");
+//                                }
+//                            });
+//                            return;
+//                        }
+//                        count ++;
+//                    }
                     final String receivedData = mWifi.sendcommand_getstring(command, delay);
                     ((Activity)mContext).runOnUiThread(new Runnable() {
                         @Override
@@ -433,24 +478,24 @@ public class PrinterController {
                     return;
                 }
                 else if(mBle != null){
-                    while (!isBlePrinterConnected()){
-                        try {
-                            Thread.sleep(200);
-                        } catch (InterruptedException e) {
-                            e.printStackTrace();
-                        }
-                        System.out.println("isBlePrinterConnected:" + count);
-                        if(count > 10) {
-                            ((Activity)mContext).runOnUiThread(new Runnable() {
-                                @Override
-                                public void run() {
-                                    listener.onCompleted(true, "Send command failed");
-                                }
-                            });
-                            return;
-                        }
-                        count ++;
-                    }
+//                    while (!isBlePrinterConnected()){
+//                        try {
+//                            Thread.sleep(200);
+//                        } catch (InterruptedException e) {
+//                            e.printStackTrace();
+//                        }
+//                        System.out.println("isBlePrinterConnected:" + count);
+//                        if(count > 10) {
+//                            ((Activity)mContext).runOnUiThread(new Runnable() {
+//                                @Override
+//                                public void run() {
+//                                    listener.onCompleted(true, "Send command failed");
+//                                }
+//                            });
+//                            return;
+//                        }
+//                        count ++;
+//                    }
                     final String receivedData = mBle.sendcommand_getstring(command, delay);
                     ((Activity)mContext).runOnUiThread(new Runnable() {
                         @Override
@@ -551,13 +596,12 @@ public class PrinterController {
                 if(resultBtOpen.equals("1")) {
                     String printResilt;
                     if(ipaddress.startsWith("192.168")){
-                        setupWifiParam();
                         printResilt = mWifi.barcode(0, 0, type, (int)info.getHeight(), 0,0, 1, 1, source);
+                        mWifi.sendcommand("PRINT 1\r\n");
                     }
                     else{
-                        setupBleParam();
                         printResilt = mBle.barcode(0, 0, type, (int)info.getHeight(), 0,0, 1, 1, source);
-                        mBle.sendcommand("Print 1");
+                        mBle.sendcommand("PRINT 1\r\n");
                     }
 
                     System.out.println(TAG + " printResilt:" + printResilt);
@@ -637,6 +681,7 @@ public class PrinterController {
                 @Override
                 public void run() {
                     ((BaseActivity)mContext).dismissProgress();
+                    mIsCommandSending = false;
                     for (Map.Entry entry : mConnectList.entrySet()) {
                         ((OnConnectListener)entry.getValue()).onConnect(true);
                     }

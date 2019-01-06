@@ -21,6 +21,7 @@ import com.afollestad.materialdialogs.DialogAction;
 import com.afollestad.materialdialogs.MaterialDialog;
 import com.tsc.printutility.Adapter.MediaInfoAdapter;
 import com.tsc.printutility.Constant;
+import com.tsc.printutility.Controller.PrinterController;
 import com.tsc.printutility.Entity.MediaInfo;
 import com.tsc.printutility.R;
 import com.tsc.printutility.Sqlite.MediaInfoController;
@@ -45,6 +46,8 @@ public class MediaSettingActivity extends AppCompatActivity {
 	private MediaInfoController mMediaInfoController;
 	private MediaInfoAdapter mAdapter;
 
+	private boolean mIsMediaChanged = false;
+
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
@@ -65,8 +68,20 @@ public class MediaSettingActivity extends AppCompatActivity {
 		mAdapter.setData(mMediaInfoController.getAll());
 		mAdapter.setOnItemClickListener(new View.OnClickListener() {
 			@Override
-			public void onClick(View view) {
-				PrefUtil.setLongPreference(MediaSettingActivity.this, Constant.Pref.PARAM_MEDIA_ID, ((MediaInfo)view.getTag()).getId());
+			public void onClick(final View view) {
+				PrefUtil.setLongPreference(MediaSettingActivity.this, Constant.Pref.PARAM_MEDIA_ID, ((MediaInfo) view.getTag()).getId());
+				PrinterController.getInstance(MediaSettingActivity.this).setup(new PrinterController.OnPrintCompletedListener() {
+					@Override
+					public void onCompleted(boolean isSuccess, String message) {
+						if(isSuccess) {
+							mIsMediaChanged = true;
+							Toast.makeText(MediaSettingActivity.this, R.string.media_size_setup_success, Toast.LENGTH_LONG).show();
+						}
+						else{
+							Toast.makeText(MediaSettingActivity.this, R.string.media_size_setup_failed, Toast.LENGTH_LONG).show();
+						}
+					}
+				});
 			}
 		});
 	}
@@ -122,6 +137,15 @@ public class MediaSettingActivity extends AppCompatActivity {
 					}
 				});
 				break;
+		}
+	}
+
+	@Override
+	public void onStop(){
+		super.onStop();
+		if(mIsMediaChanged){
+			setResult(RESULT_OK);
+			finish();
 		}
 	}
 

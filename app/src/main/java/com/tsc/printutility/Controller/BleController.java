@@ -22,6 +22,8 @@ public class BleController {
     private OnBleDiscoveryFinishedListener mOnBleDiscoveryFinishedListener;
     private BluetoothAdapter mAdapter;
 
+    private boolean mIsDiscovering = false;
+
     public interface OnBleDiscoveryFinishedListener{
         void onFinished(List<BluetoothDevice> list, boolean isFinished);
     }
@@ -48,6 +50,11 @@ public class BleController {
         catch (Exception e) {
             e.printStackTrace();
         }
+        mIsDiscovering = false;
+    }
+
+    public boolean isDiscovering() {
+         return mIsDiscovering;
     }
 
     public void getBleDeviceList(OnBleDiscoveryFinishedListener listener){
@@ -60,6 +67,7 @@ public class BleController {
         filter.addAction(BluetoothAdapter.ACTION_DISCOVERY_FINISHED);
         mContext.registerReceiver(mReceiver, filter);
         mAdapter.startDiscovery();
+        mIsDiscovering = true;
     }
 
     private final BroadcastReceiver mReceiver = new BroadcastReceiver() {
@@ -72,9 +80,10 @@ public class BleController {
             else if (BluetoothAdapter.ACTION_DISCOVERY_FINISHED.equals(action)) {
                 if(mOnBleDiscoveryFinishedListener != null)
                     mOnBleDiscoveryFinishedListener.onFinished(mDeviceList, true);
+
                 if(mContext != null && mContext instanceof BaseActivity)
                     ((BaseActivity)mContext).dismissProgress();
-                //discovery finishes, dismis progress dialog
+                mIsDiscovering = false;
             }
             else if (BluetoothDevice.ACTION_FOUND.equals(action)) {
                 //bluetooth device found

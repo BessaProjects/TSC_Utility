@@ -12,6 +12,7 @@ import com.tsc.printutility.Controller.PrinterController;
 import com.tsc.printutility.R;
 import com.tsc.printutility.Util.PrefUtil;
 import com.tsc.printutility.View.BaseActivity;
+import com.tsc.printutility.View.MainActivity;
 
 import butterknife.BindView;
 import butterknife.OnClick;
@@ -39,18 +40,24 @@ public class ConnectFragment extends BaseFragment{
 
         String battery = PrinterController.getInstance(mContext).getDeviceInfo().getBattery();
         if(battery != null) {
-            mBattery.setText(battery + "%");
+            if(battery.startsWith("0"))
+                mBattery.setText("");
+            else
+                mBattery.setText(battery + "%");
             mDevice.setText(PrinterController.getInstance(mContext).getDeviceInfo().getName());
         }
-        else {
-            PrinterController.getInstance(mContext).addOnConnectListener(getClass().getSimpleName(), new PrinterController.OnConnectListener() {
-                @Override
-                public void onConnect(boolean isSuccess) {
-                    mBattery.setText(PrinterController.getInstance(mContext).getDeviceInfo().getBattery() + "%");
-                    mDevice.setText(PrinterController.getInstance(mContext).getDeviceInfo().getName());
-                }
-            });
-        }
+        PrinterController.getInstance(mContext).addOnConnectListener(getClass().getSimpleName(), new PrinterController.OnConnectListener() {
+            @Override
+            public void onConnect(boolean isSuccess) {
+                String battery = PrinterController.getInstance(mContext).getDeviceInfo().getBattery();
+                if(battery.startsWith("0"))
+                    mBattery.setText("");
+                else
+                    mBattery.setText(battery + "%");
+                mDevice.setText(PrinterController.getInstance(mContext).getDeviceInfo().getName());
+            }
+        });
+        updateUI();
         return mView;
     }
 
@@ -60,7 +67,7 @@ public class ConnectFragment extends BaseFragment{
         updateUI();
     }
 
-    @OnClick({R.id.connect_wifi, R.id.connect_ble, R.id.connect_clear, R.id.connect_disconnect_action})
+    @OnClick({R.id.connect_wifi, R.id.connect_ble, R.id.connect_clear, R.id.connect_disconnect_action, R.id.connect_find_me_on, R.id.connect_find_me_off})
     public void onClick(View view){
         switch (view.getId()){
             case R.id.connect_wifi:
@@ -70,11 +77,13 @@ public class ConnectFragment extends BaseFragment{
                     public void onSelected(String name, final String address) {
                         PrefUtil.setStringPreference(mContext, Constant.Pref.LAST_CONNECTED_DEVICE, Constant.DeviceType.WIFI);
                         PrefUtil.setStringPreference(mContext, Constant.Pref.DEVICE_WIFI_ADDRESS, address);
+
                         PrinterController.getInstance(mContext).connectWifiPrinter(address, new PrinterController.OnConnectListener() {
                             @Override
                             public void onConnect(boolean isSuccess) {
                                 if(isSuccess) {
                                     ((BaseActivity) mContext).setConnect(true);
+                                    ((MainActivity)mContext).setBlockTab(false);
                                     mAddress.setText(address);
                                 }
                                 updateUI();
@@ -112,10 +121,20 @@ public class ConnectFragment extends BaseFragment{
                     public void onCompleted(boolean isSuccess, String message) {
                         if(isSuccess){
                             ((BaseActivity)mContext).setConnect(false);
+                            ((MainActivity)mContext).setBlockTab(true);
+                            PrinterController.getInstance(mContext).clearDeviceInfo();
+                            mDevice.setText("");
+                            mBattery.setText("");
                             updateUI();
                         }
                     }
                 });
+                break;
+            case R.id.connect_find_me_on:
+                setSingleCommand("SET FINDME ON\r\n");
+                break;
+            case R.id.connect_find_me_off:
+                setSingleCommand("SET FINDME OFF\r\n");
                 break;
         }
     }
@@ -134,6 +153,7 @@ public class ConnectFragment extends BaseFragment{
                     public void onConnect(boolean isSuccess) {
                         if(isSuccess){
                             ((BaseActivity)mContext).setConnect(true);
+                            ((MainActivity)mContext).setBlockTab(false);
                             mAddress.setText(address);
                         }
                         updateUI();

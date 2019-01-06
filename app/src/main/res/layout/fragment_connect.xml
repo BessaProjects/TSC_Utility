@@ -67,6 +67,7 @@
                 android:text="Clear connected record"
                 android:textColor="@color/color_blue_btn_txt" />
         </LinearLayout>
+
     </LinearLayout>
 
     <LinearLayout
@@ -113,6 +114,30 @@
 
         </LinearLayout>
 
+        <LinearLayout
+            style="@style/style_info_parent"
+            android:layout_marginTop="1dp"
+            android:background="@android:color/white">
+
+            <TextView
+                style="@style/style_info_title"
+                android:text="Find me"/>
+
+            <Button
+                android:id="@+id/connect_find_me_on"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="0.5"
+                android:text="ON"/>
+
+            <Button
+                android:id="@+id/connect_find_me_off"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="0.5"
+                android:text="OFF"/>
+        </LinearLayout>
+
         <RelativeLayout
             android:layout_width="match_parent"
             android:layout_height="match_parent">
@@ -129,7 +154,7 @@
                 android:background="@android:color/white"
                 android:layout_gravity="center"
                 android:gravity="center"
-                android:text="Disconnect"/>
+                android:text="@string/general_disconnect"/>
 
         </RelativeLayout>
     </LinearLayout>

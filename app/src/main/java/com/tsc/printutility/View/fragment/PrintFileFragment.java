@@ -84,7 +84,7 @@ public class PrintFileFragment extends BaseFragment {
                     e.printStackTrace();
                 }
                 System.out.println("printFile path:" + path);
-                if(path != null && (path.endsWith(".png") || path.endsWith(".jpg") || path.endsWith(".jpeg") || path.endsWith(".pdf"))){
+                if(path != null && (path.toLowerCase().endsWith(".png") || path.toLowerCase().endsWith(".jpg") || path.toLowerCase().endsWith(".jpeg") || path.toLowerCase().endsWith(".pdf"))){
                     Intent i = new Intent(mContext, MainActivity.class);
                     i.putExtra(Constant.Extra.FILE_PATH, path);
                     startActivity(i);
@@ -103,7 +103,7 @@ public class PrintFileFragment extends BaseFragment {
                 System.out.println("printFile path uri:" + uri + ", " + uri.getPath());
                 String path = FileUtil.getPath(mContext, uri);
                 System.out.println("printFile path:" + path);
-                if(path != null && (path.endsWith(".png") || path.endsWith(".jpg") || path.endsWith(".jpeg") || path.endsWith(".pdf"))){
+                if(path != null && (path.toLowerCase().endsWith(".png") || path.toLowerCase().endsWith(".jpg") || path.toLowerCase().endsWith(".jpeg") || path.toLowerCase().endsWith(".pdf"))){
                     Intent i = new Intent(mContext, MainActivity.class);
                     i.putExtra(Constant.Extra.FILE_PATH, path);
                     startActivity(i);

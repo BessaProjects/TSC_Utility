@@ -20,6 +20,7 @@ import com.tsc.printutility.Controller.BleController;
 import com.tsc.printutility.Controller.PrinterController;
 import com.tsc.printutility.Controller.WifiContoller;
 import com.tsc.printutility.Entity.MediaInfo;
+import com.tsc.printutility.R;
 import com.tsc.printutility.Sqlite.MediaInfoController;
 import com.tsc.printutility.Util.DeviceUtil;
 import com.tsc.printutility.Util.PrefUtil;
@@ -39,9 +40,6 @@ public class BaseActivity extends AppCompatActivity {
     private KProgressHUD mProgress;
     private MaterialDialog mBleListDialog;
 
-    public double mWidth, mHeight;
-    public int  mUnit, mDpi;
-    public boolean mIsResize;
     protected MediaInfoController mMediaInfoController;
     public MediaInfo mDefaultMediaInfo;
 
@@ -63,19 +61,27 @@ public class BaseActivity extends AppCompatActivity {
     }
 
     public void showProgress(String label){
-        if(this != null && !this.isFinishing())
+        if(this != null && !this.isFinishing() && !isProgressShowing()) {
             mProgress = KProgressHUD.create(this)
-                .setStyle(KProgressHUD.Style.SPIN_INDETERMINATE)
-                .setLabel(label)
-                .setCancellable(true)
-                .setAnimationSpeed(2)
-                .setDimAmount(0.5f)
-                .show();
+                    .setStyle(KProgressHUD.Style.SPIN_INDETERMINATE)
+                    .setLabel(label)
+                    .setCancellable(true)
+                    .setAnimationSpeed(2)
+                    .setDimAmount(0.5f)
+                    .show();
+        }
     }
 
     public void dismissProgress(){
-        if(mProgress != null && this != null && !this.isFinishing())
+        if(mProgress != null && this != null && !this.isFinishing()) {
             mProgress.dismiss();
+        }
+    }
+
+    public boolean isProgressShowing(){
+        if(mProgress != null && mProgress.isShowing())
+            return true;
+        return false;
     }
 
     public void showBleDeviceList(final OnDeviceSelectedListener listener){
@@ -89,7 +95,7 @@ public class BaseActivity extends AppCompatActivity {
                     dismissProgress();
 
                     if(list.size() == 0){
-                        Toast.makeText(BaseActivity.this, "Cannot find any device.", Toast.LENGTH_LONG).show();
+                        Toast.makeText(BaseActivity.this, R.string.alert_device_cannot_find, Toast.LENGTH_LONG).show();
                     }
                 }
                 if(list.size() > 0) {
@@ -115,11 +121,13 @@ public class BaseActivity extends AppCompatActivity {
                                 .dismissListener(new DialogInterface.OnDismissListener() {
                                     @Override
                                     public void onDismiss(DialogInterface dialogInterface) {
-                                        BleController.getInstance(BaseActivity.this).cancelDiscovery();
-                                        dismissProgress();
+                                        if(BleController.getInstance(BaseActivity.this).isDiscovering()) {
+                                            dismissProgress();
+                                            BleController.getInstance(BaseActivity.this).cancelDiscovery();
+                                        }
                                     }
                                 })
-                                .positiveText("Connect").onPositive(new MaterialDialog.SingleButtonCallback() {
+                                .positiveText(R.string.general_connect).onPositive(new MaterialDialog.SingleButtonCallback() {
                                     @Override
                                     public void onClick(@NonNull MaterialDialog dialog, @NonNull DialogAction which) {
                                         dismissProgress();
@@ -128,7 +136,7 @@ public class BaseActivity extends AppCompatActivity {
                                             listener.onSelected(list.get(dialog.getSelectedIndex()).getName(), list.get(dialog.getSelectedIndex()).getAddress());
                                     }
                                 })
-                                .negativeText("Cancel").onNegative(new MaterialDialog.SingleButtonCallback() {
+                                .negativeText(R.string.general_cancel).onNegative(new MaterialDialog.SingleButtonCallback() {
                                     @Override
                                     public void onClick(@NonNull MaterialDialog dialog, @NonNull DialogAction which) {
                                         dialog.dismiss();
@@ -149,7 +157,7 @@ public class BaseActivity extends AppCompatActivity {
                     dismissProgress();
 
                     if(list.size() == 0){
-                        Toast.makeText(BaseActivity.this, "Cannot find any device.", Toast.LENGTH_LONG).show();
+                        Toast.makeText(BaseActivity.this, R.string.alert_device_cannot_find, Toast.LENGTH_LONG).show();
                     }
                 }
                 if(list.size() > 0) {
@@ -179,18 +187,20 @@ public class BaseActivity extends AppCompatActivity {
                                 .dismissListener(new DialogInterface.OnDismissListener() {
                                     @Override
                                     public void onDismiss(DialogInterface dialogInterface) {
-                                        BleController.getInstance(BaseActivity.this).cancelDiscovery();
-                                        dismissProgress();
+                                        if(WifiContoller.getInstance(BaseActivity.this).isDiscovering()) {
+                                            dismissProgress();
+                                            WifiContoller.getInstance(BaseActivity.this).cancelDiscovery();
+                                        }
                                     }
                                 })
-                                .neutralText("refresh").onNeutral(new MaterialDialog.SingleButtonCallback() {
+                                .neutralText(R.string.general_refresh).onNeutral(new MaterialDialog.SingleButtonCallback() {
                                     @Override
                                     public void onClick(@NonNull MaterialDialog dialog, @NonNull DialogAction which) {
-                                        BleController.getInstance(BaseActivity.this).cancelDiscovery();
+                                        WifiContoller.getInstance(BaseActivity.this).cancelDiscovery();
                                         showIpDeviceList(listener);
                                     }
                                 })
-                                .positiveText("Connect").onPositive(new MaterialDialog.SingleButtonCallback() {
+                                .positiveText(R.string.general_connect).onPositive(new MaterialDialog.SingleButtonCallback() {
                                     @Override
                                     public void onClick(@NonNull MaterialDialog dialog, @NonNull DialogAction which) {
                                         dismissProgress();
@@ -198,7 +208,7 @@ public class BaseActivity extends AppCompatActivity {
                                         listener.onSelected(list.get(dialog.getSelectedIndex()), list.get(dialog.getSelectedIndex()));
                                     }
                                 })
-                                .negativeText("Cancel").onNegative(new MaterialDialog.SingleButtonCallback() {
+                                .negativeText(R.string.general_cancel).onNegative(new MaterialDialog.SingleButtonCallback() {
                                     @Override
                                     public void onClick(@NonNull MaterialDialog dialog, @NonNull DialogAction which) {
                                         dialog.dismiss();
@@ -211,11 +221,11 @@ public class BaseActivity extends AppCompatActivity {
         });
     }
     private void scanBleDevice(final Object source){
-        showProgress("Discovering...");
+        showProgress(getString(R.string.device_discovering));
         showBleDeviceList(new OnDeviceSelectedListener() {
             @Override
             public void onSelected(final String name, final String address) {
-                showProgress("Printing");
+                showProgress(getString(R.string.device_printing));
                 printByBle(source, address, name);
             }
         });
@@ -230,7 +240,7 @@ public class BaseActivity extends AppCompatActivity {
                     showDataTransferDialog(name + "\n" + address);
                 }
                 else
-                    Toast.makeText(BaseActivity.this, "Something wrong!!", Toast.LENGTH_LONG).show();
+                    Toast.makeText(BaseActivity.this, R.string.general_something_wrong, Toast.LENGTH_LONG).show();
             }
         });
     }
@@ -241,8 +251,8 @@ public class BaseActivity extends AppCompatActivity {
             public void run() {
                 new MaterialDialog.Builder(BaseActivity.this)
                         .cancelable(false)
-                        .content("Disconnect " + address + "\ndata transferring, please confirm printer is completely printed.")
-                        .positiveText("close").onPositive(new MaterialDialog.SingleButtonCallback() {
+                        .content(getString(R.string.device_confirm_completely_printed, address))
+                        .positiveText(R.string.general_close).onPositive(new MaterialDialog.SingleButtonCallback() {
                     @Override
                     public void onClick(@NonNull MaterialDialog dialog, @NonNull DialogAction which) {
                         dialog.dismiss();
@@ -253,11 +263,11 @@ public class BaseActivity extends AppCompatActivity {
     }
 
     private void scanIpDevice(final Object source){
-        showProgress("Discovering...");
+        showProgress(getString(R.string.device_discovering));
         showIpDeviceList(new OnDeviceSelectedListener() {
             @Override
             public void onSelected(String name, final String address) {
-                showProgress("Printing");
+                showProgress(getString(R.string.device_printing));
                 printByWifi(source, address);
             }
         });
@@ -272,7 +282,7 @@ public class BaseActivity extends AppCompatActivity {
                     showDataTransferDialog(address);
                 }
                 else
-                    Toast.makeText(BaseActivity.this, "Something wrong!!", Toast.LENGTH_LONG).show();
+                    Toast.makeText(BaseActivity.this, R.string.general_something_wrong, Toast.LENGTH_LONG).show();
             }
         });
     }
@@ -280,14 +290,14 @@ public class BaseActivity extends AppCompatActivity {
     public void showDevicePicker(final Object source){
         final String lastConnectedDevice = PrefUtil.getStringPreference(this, Constant.Pref.LAST_CONNECTED_DEVICE);
         final String address;
-        String content = "Using ";
+        String content;
         if(lastConnectedDevice != null && lastConnectedDevice.equals(Constant.DeviceType.WIFI)){
             address = PrefUtil.getStringPreference(this, Constant.Pref.DEVICE_WIFI_ADDRESS);
-            content += address + " to print.";
+            content = getString(R.string.device_using_to_print, address);
         }
         else if(lastConnectedDevice != null && lastConnectedDevice.equals(Constant.DeviceType.BLUETOOTH)){
             address = PrefUtil.getStringPreference(this, Constant.Pref.DEVICE_BT_ADDRESS);
-            content += PrefUtil.getStringPreference(this, Constant.Pref.DEVICE_BT_NAME) + " to print.";
+            content = getString(R.string.device_using_to_print, PrefUtil.getStringPreference(this, Constant.Pref.DEVICE_BT_NAME));
         }
         else{
             new MaterialDialog.Builder(BaseActivity.this)
@@ -326,14 +336,14 @@ public class BaseActivity extends AppCompatActivity {
 
         new MaterialDialog.Builder(BaseActivity.this)
                 .content(content)
-                .negativeText("Cancel")
+                .negativeText(R.string.general_cancel)
                 .onNegative(new MaterialDialog.SingleButtonCallback() {
                     @Override
                     public void onClick(@NonNull MaterialDialog dialog, @NonNull DialogAction which) {
                         dialog.dismiss();
                     }
                 })
-                .positiveText("OK")
+                .positiveText(R.string.general_ok)
                 .onPositive(new MaterialDialog.SingleButtonCallback() {
                     @Override
                     public void onClick(@NonNull MaterialDialog dialog, @NonNull DialogAction which) {
@@ -355,14 +365,6 @@ public class BaseActivity extends AppCompatActivity {
         PermissionManager.handleResult(this, requestCode, permissions, grantResults);
     }
 
-
-    @Override
-    public void onResume(){
-        super.onResume();
-
-
-    }
-
     public void setConnect(boolean connect){
         mIsConnected = connect;
     }
@@ -378,6 +380,7 @@ public class BaseActivity extends AppCompatActivity {
     @Override
     public void onDestroy(){
         dismissProgress();
+        PrinterController.getInstance(this).closeport();
         super.onDestroy();
     }
 

@@ -12,6 +12,7 @@
     <string name="general_leave">Leave</string>
     <string name="general_delete">Delete</string>
     <string name="general_refresh">Refresh</string>
+    <string name="general_close">Close</string>
 
     <string name="general_cancel">Cancel</string>
     <string name="general_confirm">Confirm</string>
@@ -42,11 +43,15 @@
     <string name="device_oom">Out Of Memory error</string>
     <string name="device_ble_open_failed">Bluetooth open port failed!</string>
     <string name="device_wifi_open_failed">:9100 Open port failed!</string>
+    <string name="device_confirm_completely_printed">Disconnect %s \ndata transferring, please confirm printer is completely printed.</string>
 
     <string name="media_delete_check">Are you sure delete %s</string>
     <string name="media_pick_alert">Please pick a Media.</string>
     <string name="media_field_cannot_empty">Name, width and height cannot be empty!</string>
     <string name="media_size_cannot_zero">Width and height cannot be 0.</string>
+
+    <string name="media_size_setup_success">Media setup success.</string>
+    <string name="media_size_setup_failed">Media setup failed, please pick media to set again.</string>
 
 
     <string-array name="barcode_print_type_list">

@@ -1,18 +1,15 @@
 package com.tsc.printutility.Controller;
 
 import android.content.Context;
-import android.net.wifi.WifiManager;
 import android.os.Handler;
 import android.os.Message;
 import android.os.StrictMode;
 
 import com.tsc.printutility.Util.CommonUtil;
 
-import java.io.IOException;
 import java.net.DatagramPacket;
 import java.net.DatagramSocket;
 import java.net.InetAddress;
-import java.net.UnknownHostException;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -23,7 +20,7 @@ public class WifiContoller {
     private Context mContext;
 
     private List<String> mIpList = new ArrayList<>();
-    private List<Thread> mThreadPool = new ArrayList<>();
+    private boolean mIsDiscovering = false;
 
     public interface OnIpDiscoveryFinishedListener{
         void onFinished(List<String> list, boolean isFinish);
@@ -52,72 +49,18 @@ public class WifiContoller {
 
     private int mPingIpCount = 0;
 
-    public void getIpList(final OnIpDiscoveryFinishedListener listener){
-        cancelDiscovery();
-        WifiManager wifii = (WifiManager) mContext.getSystemService(Context.WIFI_SERVICE);
-        final String ip = intToIp(wifii.getDhcpInfo().ipAddress, true);
-        final String myIp = intToIp(wifii.getDhcpInfo().ipAddress, false);
-        System.out.println("IP:" + myIp);
-        mPingIpCount = 0;
-        for (int i = 0; i < 256; i++) {
-            final String host = ip + i;
-
-            final int delay = i;
-            Thread th = new Thread(new Runnable() {
-                @Override
-                public void run() {
-                    try {
-                        try{
-                            Thread.sleep(15 * delay);
-                        } catch(InterruptedException e){
-                            e.printStackTrace();
-                            return;
-                        }
-
-                        InetAddress inetAddress = InetAddress.getByName(host);
-                        final String hostIp = inetAddress.toString().replace("/", "");
-
-                        System.out.println("IP mPingIpCount:" + mPingIpCount);
-
-                        boolean isReachable = inetAddress.isReachable(100);
-                        mPingIpCount ++;
-//                        if (NetworkUtil.isReachable(hostIp.toString(), Constant.ParamDefault.PORT) && !hostIp.toString().equals(myIp)){
-                        if(isReachable && !hostIp.toString().equals(myIp)){
-                            System.out.println("IP ok:" + hostIp + ", " + myIp);
-                            mIpList.add(host);
-
-                            Message m = new Message();
-                            m.what = 1;
-                            m.obj = listener;
-                            mHandler.sendMessage(m);
-                        }
-                        else if(mPingIpCount == 255){
-                            Message m = new Message();
-                            m.what = 1;
-                            m.obj = listener;
-                            mHandler.sendMessage(m);
-                        }
-
-                    } catch (UnknownHostException e) {
-                        e.printStackTrace();
-                    } catch (IOException e) {
-                        e.printStackTrace();
-                    }
-                }
-            });
-            th.start();
-            mThreadPool.add(th);
+    public void cancelDiscovery(){
+        System.out.println("cancelDiscovery:");
+        mIpList.clear();
+        if(mDiscoveryUDP != null){
+            mDiscoveryUDP.interrupt();
+            mDiscoveryUDP = null;
         }
+        mIsDiscovering = false;
     }
 
-    public void cancelDiscovery(){
-        System.out.println("cancelDiscovery:" + mThreadPool.size());
-        for(Thread thread:mThreadPool){
-            if(thread != null)
-                thread.interrupt();
-        }
-        mThreadPool.clear();
-        mIpList.clear();
+    public boolean isDiscovering() {
+        return mIsDiscovering;
     }
 
     public String intToIp(int i, boolean ignoreSubnet) {
@@ -143,7 +86,7 @@ public class WifiContoller {
         }
 
         mIpList.clear();
-
+        mIsDiscovering = true;
         mDiscoveryUDP = new Thread(new Runnable() {
             @Override
             public void run() {
@@ -205,11 +148,11 @@ public class WifiContoller {
                     m.obj = listener;
                     mHandler.sendMessage(m);
                 }
+                mIsDiscovering = false;
             }
         });
         mDiscoveryUDP.start();
     }
-
 
     private String getIpAddress(byte[] udpbyte) {
         String ip = "";

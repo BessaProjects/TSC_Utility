@@ -1,5 +1,6 @@
 package com.tsc.printutility.View.fragment;
 
+import android.app.Activity;
 import android.content.Intent;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
@@ -42,26 +43,22 @@ public class PrintBarcodeFragment extends BaseFragment {
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         super.onCreateView(inflater, container, R.layout.fragment_print_barcode);
+
+        PrinterController.getInstance(mContext).addOnConnectListener(getClass().getSimpleName(), new PrinterController.OnConnectListener() {
+            @Override
+            public void onConnect(boolean isSuccess) {
+                DeviceInfo info = PrinterController.getInstance(mContext).getDeviceInfo();
+                mWidth.setText(info.getWidth() + " px");
+                mHeight.setText(info.getHeight() + " px");
+                mSensorType.setText(info.getSensor());
+            }
+        });
         return mView;
     }
 
     @Override
     public void onResume(){
         super.onResume();
-//        MediaInfo info = ((BaseActivity)mContext).getDefaultMediaInfo();
-//        if(info != null){
-//            mMediaSze.setText(info.getName());
-//            if(info.getUnit() == MediaInfo.UNIT_IN) {
-//                mWidth.setText(info.getWidth() + " in");
-//                mHeight.setText(info.getHeight() + " in");
-//            }
-//            else{
-//                mWidth.setText(info.getWidth() + " mm");
-//                mHeight.setText(info.getHeight() + " mm");
-//            }
-//            mSensorType.setText(info.getSensorType());
-//        }
-
         DeviceInfo info = PrinterController.getInstance(mContext).getDeviceInfo();
         mWidth.setText(info.getWidth() + " px");
         mHeight.setText(info.getHeight() + " px");
@@ -105,7 +102,7 @@ public class PrintBarcodeFragment extends BaseFragment {
                 break;
             case R.id.print_barcode_media_size:
                 Intent i = new Intent(mContext, MediaSettingActivity.class);
-                startActivity(i);
+                startActivityForResult(i, MainActivity.REQUEST_MEDIA_SIZE_CHANGE);
                 break;
             case R.id.print_barcode_type:
                 String[] typeList = mContext.getResources().getStringArray(R.array.barcode_print_type_list);
@@ -126,6 +123,17 @@ public class PrintBarcodeFragment extends BaseFragment {
                         })
                         .show();
                 break;
+        }
+    }
+
+    @Override
+    public void onActivityResult(int requestCode, int resultCode, Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
+        if(resultCode == Activity.RESULT_OK && MainActivity.REQUEST_MEDIA_SIZE_CHANGE == requestCode) {
+            ((BaseActivity)mContext).showProgress(null);
+            PrinterController.getInstance(mContext).addCommandQueue(PrinterController.COMMAND_WIDTH);
+            PrinterController.getInstance(mContext).addCommandQueue(PrinterController.COMMAND_HEIGHT);
+            PrinterController.getInstance(mContext).addCommandQueue(PrinterController.COMMAND_SENSOR);
         }
     }
 }

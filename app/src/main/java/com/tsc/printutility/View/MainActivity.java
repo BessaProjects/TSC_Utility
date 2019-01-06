@@ -43,6 +43,8 @@ import rebus.permissionutils.SimpleCallback;
 
 public class MainActivity extends BaseActivity {
 
+    public static final int REQUEST_MEDIA_SIZE_CHANGE = 989;
+
     public enum FragmentPage{
         PAGE_SETTING, PAGE_COMMAND, PAGE_CONNECT, PAGE_PRINT, PAGE_PRINT_BARCODE, PAGE_PRINT_WEB, PAGE_PRINT_FILE
     }
@@ -86,6 +88,7 @@ public class MainActivity extends BaseActivity {
         mBottomNavigation.setDefaultBackgroundColor(getResources().getColor(R.color.color_main));
         mBottomNavigation.setAccentColor(Color.YELLOW);
         mBottomNavigation.setInactiveColor(Color.WHITE);
+        mBottomNavigation.setItemDisableColor(Color.WHITE);
         mBottomNavigation.setTitleState(AHBottomNavigation.TitleState.ALWAYS_SHOW);
 
         mBottomNavigation.setOnTabSelectedListener(new AHBottomNavigation.OnTabSelectedListener() {
@@ -111,7 +114,6 @@ public class MainActivity extends BaseActivity {
                 return true;
             }
         });
-
         mPendingIntent = PendingIntent.getActivity(this, 0, new Intent(this, getClass()).addFlags(Intent.FLAG_ACTIVITY_SINGLE_TOP), 0);
         onNewIntent(getIntent());
 
@@ -122,9 +124,28 @@ public class MainActivity extends BaseActivity {
             PrinterController.getInstance(this).addOnConnectListener(getClass().getSimpleName(), new PrinterController.OnConnectListener() {
                 @Override
                 public void onConnect(boolean isSuccess) {
-                    mName.setText(PrinterController.getInstance(MainActivity.this).getDeviceInfo().getName());
+                    if(isSuccess) {
+                        setBlockTab(false);
+                        mName.setText(PrinterController.getInstance(MainActivity.this).getDeviceInfo().getName());
+                        if(mBottomNavigation.getCurrentItem() == 0)
+                            gotoFragment(FragmentPage.PAGE_SETTING);
+                    }
                 }
             });
+        }
+    }
+
+    public void setBlockTab(boolean isBlock){
+        if(isBlock) {
+            mName.setText("");
+            mBottomNavigation.disableItemAtPosition(0);
+            mBottomNavigation.disableItemAtPosition(1);
+            mBottomNavigation.disableItemAtPosition(2);
+        }
+        else{
+            mBottomNavigation.enableItemAtPosition(0);
+            mBottomNavigation.enableItemAtPosition(1);
+            mBottomNavigation.enableItemAtPosition(2);
         }
     }
 
@@ -132,34 +153,27 @@ public class MainActivity extends BaseActivity {
         hideKeyboard();
         switch (page){
             case PAGE_SETTING:
-                mBottomNavigation.setCurrentItem(0);
                 mCurrentFragment = new SettingFragment();
                 break;
             case PAGE_COMMAND:
-                mBottomNavigation.setCurrentItem(2);
                 mCurrentFragment = new CommandFragment();
                 break;
             case PAGE_CONNECT:
-                mBottomNavigation.setCurrentItem(3);
                 mCurrentFragment = new ConnectFragment();
                 break;
             case PAGE_PRINT:
-                mBottomNavigation.setCurrentItem(1);
                 mCurrentFragment = new PrintFragment();
                 break;
             case PAGE_PRINT_BARCODE:
-                mBottomNavigation.setCurrentItem(1);
                 mCurrentFragment = new PrintBarcodeFragment();
                 break;
             case PAGE_PRINT_WEB:
-                mBottomNavigation.setCurrentItem(1);
                 mCurrentFragment = new PrintWebFragment();
                 Bundle bundle = new Bundle();
                 bundle.putString(Constant.Extra.FILE_PATH, getIntent().getStringExtra(Constant.Extra.FILE_PATH));
                 mCurrentFragment.setArguments(bundle);
                 break;
             case PAGE_PRINT_FILE:
-                mBottomNavigation.setCurrentItem(1);
                 mCurrentFragment = new PrintFileFragment();
                 break;
         }
@@ -198,6 +212,7 @@ public class MainActivity extends BaseActivity {
                     String currentName = mCurrentFragment.getClass().getSimpleName();
                     if(currentName.equals(PrintBarcodeFragment.class.getSimpleName()) || currentName.equals(PrintWebFragment.class.getSimpleName())
                             || currentName.equals(PrintFileFragment.class.getSimpleName())){
+                        mBottomNavigation.setCurrentItem(1);
                         gotoFragment(FragmentPage.PAGE_PRINT);
                     }
                 }
@@ -260,6 +275,7 @@ public class MainActivity extends BaseActivity {
 
         String webPrintFile = getIntent().getStringExtra(Constant.Extra.FILE_PATH);
         if(webPrintFile != null){
+            mBottomNavigation.setCurrentItem(1);
             gotoFragment(FragmentPage.PAGE_PRINT_WEB);
         }
     }
@@ -304,14 +320,21 @@ public class MainActivity extends BaseActivity {
                                     @Override
                                     public void onConnect(boolean isSuccess) {
                                         mIsConnected = isSuccess;
-                                        if (mIsConnected)
+                                        if (mIsConnected) {
+                                            setBlockTab(false);
                                             Toast.makeText(MainActivity.this, getString(R.string.alert_is_connected, mConnectIp), Toast.LENGTH_LONG).show();
+                                        }
                                         else {
+                                            setBlockTab(true);
                                             Toast.makeText(MainActivity.this, getString(R.string.alert_connection_failed, mConnectIp), Toast.LENGTH_LONG).show();
+                                            mBottomNavigation.setCurrentItem(3);
                                             gotoFragment(FragmentPage.PAGE_CONNECT);
                                         }
                                     }
                                 });
+                            }
+                            else{
+                                setBlockTab(true);
                             }
                         }
                     });
@@ -325,19 +348,25 @@ public class MainActivity extends BaseActivity {
                             @Override
                             public void onConnect(boolean isSuccess) {
                                 mIsConnected = isSuccess;
-                                if(mIsConnected)
+                                if(mIsConnected) {
+                                    setBlockTab(false);
                                     Toast.makeText(MainActivity.this, getString(R.string.alert_is_connected, mConnectIp), Toast.LENGTH_LONG).show();
+                                }
                                 else {
+                                    setBlockTab(true);
                                     Toast.makeText(MainActivity.this, getString(R.string.alert_connection_failed, mConnectIp), Toast.LENGTH_LONG).show();
+                                    mBottomNavigation.setCurrentItem(3);
                                     gotoFragment(FragmentPage.PAGE_CONNECT);
                                 }
                             }
                         });
-
                     }
+                    else
+                        setBlockTab(true);
                 }
             }
             else {
+                mBottomNavigation.setCurrentItem(3);
                 gotoFragment(FragmentPage.PAGE_CONNECT);
             }
         }
