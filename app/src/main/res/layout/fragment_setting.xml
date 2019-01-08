@@ -146,7 +146,7 @@
                 android:visibility="gone">
 
                 <ImageView style="@style/style_info_icon"
-                    android:src="@drawable/icon_speed"
+                    android:src="@drawable/icon_density"
                     android:tint="@color/color_blue_btn_txt"/>
 
                 <TextView
@@ -162,7 +162,7 @@
                 android:background="@android:color/white">
 
                 <ImageView style="@style/style_info_icon"
-                    android:src="@drawable/icon_speed"
+                    android:src="@drawable/icon_density"
                     android:tint="@color/color_blue_btn_txt"/>
 
                 <TextView

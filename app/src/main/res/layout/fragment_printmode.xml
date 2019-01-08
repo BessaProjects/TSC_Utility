@@ -10,6 +10,10 @@
         style="@style/style_info_parent"
         android:background="@android:color/white">
 
+        <ImageView style="@style/style_info_icon"
+            android:src="@drawable/icon_barcode"
+            android:tint="@color/color_blue_btn_txt" />
+
         <TextView
             style="@style/style_info_title"
             android:text="Barcode"
@@ -23,6 +27,10 @@
         android:background="@android:color/white"
         android:layout_marginTop="1dp">
 
+        <ImageView style="@style/style_info_icon"
+            android:src="@drawable/icon_file"
+            android:tint="@color/color_blue_btn_txt" />
+
         <TextView
             style="@style/style_info_title"
             android:text="File"
@@ -35,6 +43,10 @@
         style="@style/style_info_parent"
         android:background="@android:color/white"
         android:layout_marginTop="1dp">
+
+        <ImageView style="@style/style_info_icon"
+            android:src="@drawable/icon_testprint"
+            android:tint="@color/color_blue_btn_txt" />
 
         <TextView
             style="@style/style_info_title"

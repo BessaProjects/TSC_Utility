@@ -142,19 +142,37 @@
             android:layout_width="match_parent"
             android:layout_height="match_parent">
 
-            <TextView
+            <RelativeLayout
                 android:id="@+id/connect_disconnect_action"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:textColor="@color/color_blue_btn_txt"
-                android:layout_alignParentBottom="true"
-                android:textSize="18sp"
-                android:padding="10dp"
-                android:layout_marginTop="5dp"
                 android:background="@android:color/white"
-                android:layout_gravity="center"
-                android:gravity="center"
-                android:text="@string/general_disconnect"/>
+                android:layout_alignParentBottom="true"
+                android:layout_marginTop="5dp">
+
+                <LinearLayout
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_centerInParent="true">
+
+                    <ImageView style="@style/style_info_icon"
+                        android:src="@drawable/icon_disconnect"
+                        android:tint="@color/color_blue_btn_txt"/>
+
+                    <TextView
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:textColor="@color/color_blue_btn_txt"
+                        android:textSize="18sp"
+                        android:padding="10dp"
+                        android:layout_gravity="center"
+                        android:gravity="center"
+                        android:text="@string/general_disconnect"/>
+                </LinearLayout>
+
+
+            </RelativeLayout>
+
 
         </RelativeLayout>
     </LinearLayout>
