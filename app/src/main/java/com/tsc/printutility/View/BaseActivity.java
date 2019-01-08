@@ -5,6 +5,7 @@ import android.bluetooth.BluetoothAdapter;
 import android.bluetooth.BluetoothDevice;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.content.pm.ActivityInfo;
 import android.support.annotation.NonNull;
 import android.support.v4.app.FragmentManager;
 import android.support.v7.app.AppCompatActivity;
@@ -47,6 +48,7 @@ public class BaseActivity extends AppCompatActivity {
     public String mConnectIp = "";
 
     protected void onCreate(int layout) {
+        setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_PORTRAIT);
         setContentView(layout);
         ButterKnife.bind(this);
         mMediaInfoController = new MediaInfoController(this);
@@ -132,7 +134,7 @@ public class BaseActivity extends AppCompatActivity {
                                     public void onClick(@NonNull MaterialDialog dialog, @NonNull DialogAction which) {
                                         dismissProgress();
                                         dialog.dismiss();
-                                        if(dialog.getSelectedIndex() < list.size())
+                                        if(dialog.getSelectedIndex() < list.size() && dialog.getSelectedIndex() >= 0)
                                             listener.onSelected(list.get(dialog.getSelectedIndex()).getName(), list.get(dialog.getSelectedIndex()).getAddress());
                                     }
                                 })
@@ -205,7 +207,8 @@ public class BaseActivity extends AppCompatActivity {
                                     public void onClick(@NonNull MaterialDialog dialog, @NonNull DialogAction which) {
                                         dismissProgress();
                                         dialog.dismiss();
-                                        listener.onSelected(list.get(dialog.getSelectedIndex()), list.get(dialog.getSelectedIndex()));
+                                        if(dialog.getSelectedIndex() < list.size() && dialog.getSelectedIndex() >= 0)
+                                            listener.onSelected(list.get(dialog.getSelectedIndex()), list.get(dialog.getSelectedIndex()));
                                     }
                                 })
                                 .negativeText(R.string.general_cancel).onNegative(new MaterialDialog.SingleButtonCallback() {
@@ -251,7 +254,7 @@ public class BaseActivity extends AppCompatActivity {
             public void run() {
                 new MaterialDialog.Builder(BaseActivity.this)
                         .cancelable(false)
-                        .content(getString(R.string.device_confirm_completely_printed, address))
+                        .content(getString(R.string.device_confirm_completely_printed))
                         .positiveText(R.string.general_close).onPositive(new MaterialDialog.SingleButtonCallback() {
                     @Override
                     public void onClick(@NonNull MaterialDialog dialog, @NonNull DialogAction which) {

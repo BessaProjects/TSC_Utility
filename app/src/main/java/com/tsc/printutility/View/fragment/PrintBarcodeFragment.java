@@ -40,6 +40,8 @@ public class PrintBarcodeFragment extends BaseFragment {
     @BindView(R.id.print_barcode_media_size)
     TextView mMediaSze;
 
+    private DeviceInfo mInfo;
+
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         super.onCreateView(inflater, container, R.layout.fragment_print_barcode);
@@ -47,10 +49,7 @@ public class PrintBarcodeFragment extends BaseFragment {
         PrinterController.getInstance(mContext).addOnConnectListener(getClass().getSimpleName(), new PrinterController.OnConnectListener() {
             @Override
             public void onConnect(boolean isSuccess) {
-                DeviceInfo info = PrinterController.getInstance(mContext).getDeviceInfo();
-                mWidth.setText(info.getWidth() + " px");
-                mHeight.setText(info.getHeight() + " px");
-                mSensorType.setText(info.getSensor());
+                updateDeviceInfo(PrinterController.getInstance(mContext).getDeviceInfo());
             }
         });
         return mView;
@@ -59,9 +58,19 @@ public class PrintBarcodeFragment extends BaseFragment {
     @Override
     public void onResume(){
         super.onResume();
-        DeviceInfo info = PrinterController.getInstance(mContext).getDeviceInfo();
-        mWidth.setText(info.getWidth() + " px");
-        mHeight.setText(info.getHeight() + " px");
+        updateDeviceInfo(PrinterController.getInstance(mContext).getDeviceInfo());
+    }
+
+    private void updateDeviceInfo(DeviceInfo info){
+        mInfo = info;
+        try {
+            float dpi = Float.parseFloat(mInfo.getDpi());
+            mWidth.setText(String.format("%.2f", (Float.parseFloat(mInfo.getWidth())/ dpi)) + " in");
+            mHeight.setText(String.format("%.2f", (Float.parseFloat(mInfo.getHeight())/ dpi)) + " in");
+
+        }catch (Exception e){
+
+        }
         mSensorType.setText(info.getSensor());
     }
 

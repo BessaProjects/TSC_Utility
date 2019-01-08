@@ -9,6 +9,15 @@ public class DeviceInfo {
     String width;
     String height;
     String sensor;
+    String dpi;
+
+    public String getDpi() {
+        return dpi;
+    }
+
+    public void setDpi(String dpi) {
+        this.dpi = dpi;
+    }
 
     public String getSpeed() {
         return speed;

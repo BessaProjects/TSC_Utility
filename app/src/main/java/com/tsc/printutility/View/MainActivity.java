@@ -50,8 +50,8 @@ public class MainActivity extends BaseActivity {
     }
 
     private BaseFragment mCurrentFragment;
-
     public FragmentManager mFragmentManager;
+    private FragmentPage mCurrentPage;
 
     @BindView(R.id.bottom_navigation)
     AHBottomNavigation mBottomNavigation;
@@ -66,6 +66,8 @@ public class MainActivity extends BaseActivity {
     private NfcAdapter mNfcAdapter;
 
     private PendingIntent mPendingIntent;
+
+    private boolean mIsBlockResumeConnect = false;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -127,8 +129,10 @@ public class MainActivity extends BaseActivity {
                     if(isSuccess) {
                         setBlockTab(false);
                         mName.setText(PrinterController.getInstance(MainActivity.this).getDeviceInfo().getName());
-                        if(mBottomNavigation.getCurrentItem() == 0)
+                        if(mCurrentPage == null)
                             gotoFragment(FragmentPage.PAGE_SETTING);
+                        else
+                            gotoFragment(mCurrentPage);
                     }
                 }
             });
@@ -150,6 +154,7 @@ public class MainActivity extends BaseActivity {
     }
 
     public void gotoFragment(FragmentPage page){
+        mCurrentPage = page;
         hideKeyboard();
         switch (page){
             case PAGE_SETTING:
@@ -281,16 +286,30 @@ public class MainActivity extends BaseActivity {
     }
 
     private void connectBle(final String address){
-        BluetoothAdapter.getDefaultAdapter().enable();
-        PrinterController.getInstance(this).connectBlePrinter(address, new PrinterController.OnConnectListener() {
+        mIsBlockResumeConnect = true;
+        PrinterController.getInstance(this).closeport(new PrinterController.OnPrintCompletedListener() {
             @Override
-            public void onConnect(boolean isSuccess) {
-                if(isSuccess) {
-                    PrefUtil.setStringPreference(MainActivity.this, Constant.Pref.LAST_CONNECTED_DEVICE, Constant.DeviceType.BLUETOOTH);
-                    PrefUtil.setStringPreference(MainActivity.this, Constant.Pref.DEVICE_BT_ADDRESS, address);
-                    PrefUtil.setStringPreference(MainActivity.this, Constant.Pref.DEVICE_BT_NAME, "");
-                    Toast.makeText(MainActivity.this, address + " 已連線", Toast.LENGTH_LONG).show();
-                }
+            public void onCompleted(boolean isSuccess, String message) {
+                BluetoothAdapter.getDefaultAdapter().enable();
+                PrinterController.getInstance(MainActivity.this).connectBlePrinter(address, new PrinterController.OnConnectListener() {
+                    @Override
+                    public void onConnect(boolean isSuccess) {
+                        if(isSuccess) {
+                            mIsConnected = true;
+                            PrefUtil.setStringPreference(MainActivity.this, Constant.Pref.LAST_CONNECTED_DEVICE, Constant.DeviceType.BLUETOOTH);
+                            PrefUtil.setStringPreference(MainActivity.this, Constant.Pref.DEVICE_BT_ADDRESS, address);
+                            PrefUtil.setStringPreference(MainActivity.this, Constant.Pref.DEVICE_BT_NAME, "");
+                            Toast.makeText(MainActivity.this, getString(R.string.alert_is_connected, address), Toast.LENGTH_LONG).show();
+
+                            if(mCurrentPage != null)
+                                gotoFragment(mCurrentPage);
+                            else
+                                gotoFragment(FragmentPage.PAGE_SETTING);
+                        }
+                        else
+                            mIsConnected = false;
+                    }
+                });
             }
         });
     }
@@ -301,7 +320,7 @@ public class MainActivity extends BaseActivity {
         if(mNfcAdapter != null)
             mNfcAdapter.enableForegroundDispatch(this, mPendingIntent, null, null);
 
-        if(!mIsConnected){
+        if(!mIsBlockResumeConnect && !mIsConnected){
             long currentMediaId = PrefUtil.getLongPreference(this, Constant.Pref.PARAM_MEDIA_ID, -1);
             if(currentMediaId != -1 && mMediaInfoController != null) {
                 mDefaultMediaInfo = mMediaInfoController.get(currentMediaId);
@@ -379,6 +398,13 @@ public class MainActivity extends BaseActivity {
         if (mNfcAdapter != null) {
             mNfcAdapter.disableForegroundDispatch(this);
         }
+    }
+
+
+    @Override
+    public void onStop(){
+        super.onStop();
+        mIsBlockResumeConnect = false;
     }
 }
 

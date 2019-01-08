@@ -12,7 +12,6 @@ import android.printservice.PrintJob;
 import android.printservice.PrintService;
 import android.printservice.PrinterDiscoverySession;
 import android.util.Log;
-import android.widget.Toast;
 
 import com.tsc.printutility.Util.FileUtil;
 import com.tsc.printutility.View.MainActivity;
@@ -149,11 +148,6 @@ public class MyPrintService extends PrintService {
 				}
 			}
 			return null;
-		}
-
-		private void show_msg(String msg) {
-			Toast toast = Toast.makeText(MyPrintService.this, msg, Toast.LENGTH_SHORT);
-			toast.show();
 		}
 
 	}

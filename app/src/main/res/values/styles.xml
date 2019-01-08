@@ -46,7 +46,7 @@
     <style name="style_title">
         <item name="android:layout_width">match_parent</item>
         <item name="android:layout_height">wrap_content</item>
-        <item name="android:textColor">@color/color_red</item>
+        <item name="android:textColor">@color/color_blue_btn_txt</item>
         <item name="android:textSize">20sp</item>
         <item name="android:padding">10dp</item>
         <item name="android:gravity">center|left</item>
@@ -58,7 +58,7 @@
         <item name="android:layout_width">0dp</item>
         <item name="android:layout_height">wrap_content</item>
         <item name="android:layout_weight">1</item>
-        <item name="android:textColor">@color/color_red</item>
+        <item name="android:textColor">@color/color_blue_btn_txt</item>
         <item name="android:textSize">18sp</item>
         <item name="android:gravity">center|left</item>
         <item name="android:layout_gravity">center|left</item>

@@ -47,7 +47,7 @@ public class MediaSettingActivity extends AppCompatActivity {
 	private MediaInfoAdapter mAdapter;
 
 	private boolean mIsMediaChanged = false;
-
+	private PrinterController mPrinterController;
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
@@ -57,6 +57,7 @@ public class MediaSettingActivity extends AppCompatActivity {
 		mTitle.setText("Media List");
 
 		mMediaInfoController = new MediaInfoController(this);
+		mPrinterController = PrinterController.getInstance(MediaSettingActivity.this);
 
 		LinearLayoutManager layoutManager = new LinearLayoutManager(this);
 		layoutManager.setOrientation(LinearLayoutManager.VERTICAL);
@@ -69,8 +70,15 @@ public class MediaSettingActivity extends AppCompatActivity {
 		mAdapter.setOnItemClickListener(new View.OnClickListener() {
 			@Override
 			public void onClick(final View view) {
-				PrefUtil.setLongPreference(MediaSettingActivity.this, Constant.Pref.PARAM_MEDIA_ID, ((MediaInfo) view.getTag()).getId());
-				PrinterController.getInstance(MediaSettingActivity.this).setup(new PrinterController.OnPrintCompletedListener() {
+				MediaInfo info = ((MediaInfo) view.getTag());
+
+				PrefUtil.setLongPreference(MediaSettingActivity.this, Constant.Pref.PARAM_MEDIA_ID, info.getId());
+				String command = mPrinterController.getSetupSizeCommand((int)info.getWidth(), (int)info.getHeight(), 0);
+
+				if(info.getSensorType().equals(MediaInfo.SENSOR_TYPE_BLACK))
+					command = mPrinterController.getSetupSizeCommand((int)info.getWidth(), (int)info.getHeight(), 1);
+
+				mPrinterController.setup(command, new PrinterController.OnPrintCompletedListener() {
 					@Override
 					public void onCompleted(boolean isSuccess, String message) {
 						if(isSuccess) {
@@ -173,8 +181,10 @@ public class MediaSettingActivity extends AppCompatActivity {
 
 		if(mediaInfo != null){
 			editName.setText(mediaInfo.getName());
-			editWidth.setText(mediaInfo.getWidth() + "");
-			editHeight.setText(mediaInfo.getHeight() + "");
+			if(mediaInfo.getWidth() > 0)
+				editWidth.setText(mediaInfo.getWidth() + "");
+			if(mediaInfo.getHeight() > 0)
+				editHeight.setText(mediaInfo.getHeight() + "");
 			if(mediaInfo.getUnit() == MediaInfo.UNIT_IN) {
 				unitIn.setChecked(true);
 				unitMm.setChecked(false);

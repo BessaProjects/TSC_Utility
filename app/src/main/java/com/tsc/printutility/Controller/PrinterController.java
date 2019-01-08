@@ -16,6 +16,7 @@ import com.tsc.printutility.Util.ImgUtil;
 import com.tsc.printutility.Util.PrefUtil;
 import com.tsc.printutility.View.BaseActivity;
 
+import java.io.UnsupportedEncodingException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
@@ -35,8 +36,9 @@ public class PrinterController {
     public static final String COMMAND_SPEED = "OUT GETSETTING$(\"CONFIG\", \"TSPL\",\"SPEED\")";
     public static final String COMMAND_DENSITY = "OUT GETSETTING$(\"CONFIG\", \"TSPL\",\"DENSITY\")";
     public static final String COMMAND_SENSOR = "OUT GETSETTING$(\"CONFIG\", \"SENSOR\",\"SENSOR TYPE\")";
+    public static final String COMMAND_DPI = "OUT GETSETTING$(\"SYSTEM\", \"INFORMATION\",\"DPI\")";
 
-    private static final String[] COMMAND_LIST = new String[]{COMMAND_HEIGHT, COMMAND_WIDTH, COMMAND_DEVICE_NAME, COMMAND_BATTERY, COMMAND_SPEED, COMMAND_DENSITY, COMMAND_SENSOR};
+    private static final String[] COMMAND_LIST = new String[]{COMMAND_HEIGHT, COMMAND_WIDTH, COMMAND_DPI, COMMAND_DEVICE_NAME, COMMAND_BATTERY, COMMAND_SPEED, COMMAND_DENSITY, COMMAND_SENSOR};
 
     private Queue<String> mCommandQueue = new PriorityQueue<>();
 
@@ -54,6 +56,8 @@ public class PrinterController {
     private HashMap<String, OnConnectListener> mConnectList = new HashMap<>();
 
     private boolean mIsCommandSending = false;
+
+    private static final int DELAY_TIMER = 300;
 
     public interface OnPrintCompletedListener{
         void onCompleted(boolean isSuccess, String message);
@@ -97,6 +101,45 @@ public class PrinterController {
         }
     }
 
+//    private String getSetupCommand(int width, int height, int speed, int density, int sensor){
+//        String size = "SIZE " + width + " mm" + ", " + height + " mm";
+//        String speed_value = "SPEED " + speed;
+//        String density_value = "DENSITY " + density;
+//        String sensor_value = "";
+//        if (sensor == 0) {
+//            sensor_value = "GAP 2 mm, 0 mm";
+//        } else if (sensor == 1) {
+//            sensor_value = "BLINE 2 mm, 0 mm";
+//        } else if (sensor == 2) {
+//            sensor_value = "GAP 2 mm, 0 mm\r\nGAP 0 mm, 0 mm";
+//        }
+//
+//        return size + "\r\n" + speed_value + "\r\n" + density_value + "\r\n" + sensor_value + "\r\n";
+//    }
+
+    public String getSetupSizeCommand(int width, int height, int sensor){
+        String size = "SIZE " + width + " mm" + ", " + height + " mm";
+        String sensor_value = "";
+        if (sensor == 0) {
+            sensor_value = "GAP 2 mm, 0 mm";
+        } else if (sensor == 1) {
+            sensor_value = "BLINE 2 mm, 0 mm";
+        } else if (sensor == 2) {
+            sensor_value = "GAP 2 mm, 0 mm\r\nGAP 0 mm, 0 mm";
+        }
+        return size + "\r\n" + sensor_value + "\r\n";
+    }
+
+    public String getSetupSpeedCommand(int speed){
+        String speed_value = "SPEED " + speed;
+        return speed_value + "\r\n";
+    }
+
+    public String getSetupDensityCommand(int density){
+        String density_value = "DENSITY " + density;
+        return density_value + "\r\n";
+    }
+
     public void connectBlePrinter(final String ipaddress, final OnConnectListener onConnectListener){
         if(mConnectThread != null)
             mConnectThread.interrupt();
@@ -130,7 +173,7 @@ public class PrinterController {
 
     public boolean isBlePrinterConnected(){
         if(mBle != null){
-            String result = mBle.status(300);
+            String result = mBle.status(DELAY_TIMER);
             if(result.equals("-1"))
                 return false;
             else
@@ -139,28 +182,21 @@ public class PrinterController {
         return false;
     }
 
-    private String setupBleParam(){
-        MediaInfo info = getMediaInfo();
-
-        int speed = PrefUtil.getIntegerPreference(mContext, Constant.Pref.PARAM_SPEED, Constant.ParamDefault.SPEED);
-        int density = PrefUtil.getIntegerPreference(mContext, Constant.Pref.PARAM_DENSITY, Constant.ParamDefault.DENSITY);
+    private String setupBleParam(String command){
         String sp = "-2";
         if(mBle != null) {
-            if (info.getUnit() == MediaInfo.UNIT_IN)
-                sp = mBle.setup((int) (info.getWidth() * 25.4f), (int) (info.getHeight() * 25.4f), speed, density, 0, 0, 0);
-            else
-                sp = mBle.setup((int) info.getWidth(), (int) info.getHeight(), speed, density, 0, 0, 0);
+            sp = mBle.sendcommand(command, DELAY_TIMER);
         }
         System.out.println(TAG + " ble setup result:" + sp);
         return sp;
     }
 
-    public void setup(final OnPrintCompletedListener listener){
+    public void setup(final String command, final OnPrintCompletedListener listener){
         new Thread(new Runnable() {
             @Override
             public void run() {
                 Looper.prepare();
-                if(setupBleParam().equals("1")) {
+                if(setupBleParam(command).equals("1")) {
                     ((Activity)mContext).runOnUiThread(new Runnable() {
                         @Override
                         public void run() {
@@ -168,7 +204,7 @@ public class PrinterController {
                         }
                     });
                 }
-                else if(setupWifiParam().equals("1")){
+                else if(setupWifiParam(command).equals("1")){
                     ((Activity)mContext).runOnUiThread(new Runnable() {
                         @Override
                         public void run() {
@@ -283,7 +319,7 @@ public class PrinterController {
 
     public boolean isWifiPrinterConnected(){
         if(mWifi != null){
-            String result = mWifi.status(300);
+            String result = mWifi.status(DELAY_TIMER);
             if(result.equals("-1"))
                 return false;
             else
@@ -297,7 +333,7 @@ public class PrinterController {
             @Override
             public void run() {
                 if (mWifi != null) {
-                    final String result = mWifi.status(300);
+                    final String result = mWifi.status(DELAY_TIMER);
                     ((Activity)mContext).runOnUiThread(new Runnable() {
                         @Override
                         public void run() {
@@ -319,20 +355,13 @@ public class PrinterController {
         }).start();
     }
 
-    public String setupWifiParam(){
-        MediaInfo info = getMediaInfo();
-
-        int speed = PrefUtil.getIntegerPreference(mContext, Constant.Pref.PARAM_SPEED, Constant.ParamDefault.SPEED);
-        int density = PrefUtil.getIntegerPreference(mContext, Constant.Pref.PARAM_DENSITY, Constant.ParamDefault.DENSITY);
-
+    public String setupWifiParam(String command){
         String sp = "-2";
         if(mWifi != null) {
-            if (info.getUnit() == MediaInfo.UNIT_IN)
-                sp = mWifi.setup((int) (info.getWidth() * 25.4f), (int) (info.getHeight() * 25.4f), speed, density, 0, 0, 0);
-            else
-                sp = mWifi.setup((int) info.getWidth(), (int) info.getHeight(), speed, density, 0, 0, 0);
+            sp = mWifi.sendcommand(command);
         }
-        System.out.println(TAG + " Wifi setup result:" + sp + ", " + speed + ", " + density);
+
+        System.out.println(TAG + "wifi ble setup result:" + sp);
         return sp;
     }
 
@@ -448,26 +477,8 @@ public class PrinterController {
         new Thread(new Runnable() {
             @Override
             public void run() {
-                int count = 0;
                 System.out.println("requestDeviceInfo ble:" + mBle);
                 if(mWifi != null){
-//                    while (!isWifiPrinterConnected()){
-//                        try {
-//                            Thread.sleep(200);
-//                        } catch (InterruptedException e) {
-//                            e.printStackTrace();
-//                        }
-//                        if(count > 10) {
-//                            ((Activity)mContext).runOnUiThread(new Runnable() {
-//                                @Override
-//                                public void run() {
-//                                    listener.onCompleted(true, "Send command failed");
-//                                }
-//                            });
-//                            return;
-//                        }
-//                        count ++;
-//                    }
                     final String receivedData = mWifi.sendcommand_getstring(command, delay);
                     ((Activity)mContext).runOnUiThread(new Runnable() {
                         @Override
@@ -478,24 +489,6 @@ public class PrinterController {
                     return;
                 }
                 else if(mBle != null){
-//                    while (!isBlePrinterConnected()){
-//                        try {
-//                            Thread.sleep(200);
-//                        } catch (InterruptedException e) {
-//                            e.printStackTrace();
-//                        }
-//                        System.out.println("isBlePrinterConnected:" + count);
-//                        if(count > 10) {
-//                            ((Activity)mContext).runOnUiThread(new Runnable() {
-//                                @Override
-//                                public void run() {
-//                                    listener.onCompleted(true, "Send command failed");
-//                                }
-//                            });
-//                            return;
-//                        }
-//                        count ++;
-//                    }
                     final String receivedData = mBle.sendcommand_getstring(command, delay);
                     ((Activity)mContext).runOnUiThread(new Runnable() {
                         @Override
@@ -529,18 +522,13 @@ public class PrinterController {
             @Override
             public void run() {
                 if(mBle != null) {
-                    System.out.println("Ble disconnect result:" + mBle.closeport(100));
+                    System.out.println("Ble disconnect result:" + mBle.closeport(200));
                     mBle = null;
                 }
 
                 if(mWifi != null) {
-                    System.out.println("Wifi disconnect result:" + mWifi.closeport(100));
+                    System.out.println("Wifi disconnect result:" + mWifi.closeport(200));
                     mWifi = null;
-                }
-                try {
-                    Thread.sleep(200);
-                } catch (InterruptedException e) {
-                    e.printStackTrace();
                 }
                 ((Activity)mContext).runOnUiThread(new Runnable() {
                     @Override
@@ -596,11 +584,13 @@ public class PrinterController {
                 if(resultBtOpen.equals("1")) {
                     String printResilt;
                     if(ipaddress.startsWith("192.168")){
-                        printResilt = mWifi.barcode(0, 0, type, (int)info.getHeight(), 0,0, 1, 1, source);
+                        mWifi.sendcommand("CLS\r\n");
+                        printResilt = mWifi.barcode(10, 10, type, 100, 1,0, 1, 1, source);
                         mWifi.sendcommand("PRINT 1\r\n");
                     }
                     else{
-                        printResilt = mBle.barcode(0, 0, type, (int)info.getHeight(), 0,0, 1, 1, source);
+                        mBle.sendcommand("CLS\r\n");
+                        printResilt = mBle.barcode(10, 10, type, 100, 1,0, 1, 1, source);
                         mBle.sendcommand("PRINT 1\r\n");
                     }
 
@@ -636,13 +626,17 @@ public class PrinterController {
         if(command != null){
             mCommandQueue.poll();
             mIsCommandSending = true;
-            sendCommand(command, 300, new OnPrintCompletedListener() {
+            sendCommand(command, DELAY_TIMER, new OnPrintCompletedListener() {
                 @Override
                 public void onCompleted(boolean isSuccess, String message) {
                     mIsCommandSending = false;
                     if(isSuccess) {
                         String result = message.replace("\n", "");
-                        System.out.println(TAG + " commandRequest:" + command + ", " + result);
+                        try {
+                            System.out.println(TAG + " commandRequest:" + command + ", " + new String(result.getBytes(),"UTF-8"));
+                        } catch (UnsupportedEncodingException e) {
+                            e.printStackTrace();
+                        }
                         try {
                             switch (command) {
                                 case COMMAND_HEIGHT:
@@ -665,6 +659,9 @@ public class PrinterController {
                                     break;
                                 case COMMAND_SENSOR:
                                     mInfo.setSensor(result);
+                                    break;
+                                case COMMAND_DPI:
+                                    mInfo.setDpi(result);
                                     break;
                             }
                         }

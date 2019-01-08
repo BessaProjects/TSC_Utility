@@ -24,8 +24,6 @@
     <string name="general_disconnect">Disconnect</string>
     <string name="general_something_wrong">Something wrong!!</string>
 
-    <string name="alert_disconnect_ble">Disconnect %1$s \n%2$s\ndata transferring, please confirm printer is completely printed.</string>
-    <string name="alert_disconnect_wifi">Disconnect %s \ndata transferring, please confirm printer is completely printed.</string>
     <string name="alert_is_connected">%s is connected.</string>
     <string name="alert_connection_failed">%s connection failed.</string>
     <string name="alert_remove_record_check">Are you sure to delete auto record?</string>
@@ -43,9 +41,10 @@
     <string name="device_oom">Out Of Memory error</string>
     <string name="device_ble_open_failed">Bluetooth open port failed!</string>
     <string name="device_wifi_open_failed">:9100 Open port failed!</string>
-    <string name="device_confirm_completely_printed">Disconnect %s \ndata transferring, please confirm printer is completely printed.</string>
+    <string name="device_confirm_completely_printed">Data transferring, please confirm printer is completely printed.</string>
+    <string name="device_file_type_not_support">This file type is not supported!</string>
 
-    <string name="media_delete_check">Are you sure delete %s</string>
+    <string name="media_delete_check">Do you want to delete %s media?</string>
     <string name="media_pick_alert">Please pick a Media.</string>
     <string name="media_field_cannot_empty">Name, width and height cannot be empty!</string>
     <string name="media_size_cannot_zero">Width and height cannot be 0.</string>

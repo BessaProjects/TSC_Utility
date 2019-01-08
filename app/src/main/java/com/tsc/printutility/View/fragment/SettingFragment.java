@@ -14,7 +14,6 @@ import com.tsc.printutility.Constant;
 import com.tsc.printutility.Controller.PrinterController;
 import com.tsc.printutility.Entity.DeviceInfo;
 import com.tsc.printutility.R;
-import com.tsc.printutility.Util.PrefUtil;
 import com.tsc.printutility.View.BaseActivity;
 import com.tsc.printutility.View.MainActivity;
 import com.tsc.printutility.View.MediaSettingActivity;
@@ -37,49 +36,64 @@ public class SettingFragment extends BaseFragment {
     @BindView(R.id.setting_sensor_type)
     TextView mSensorType;
 
+    private DeviceInfo mInfo;
+
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         super.onCreateView(inflater, container, R.layout.fragment_setting);
 
-        DeviceInfo info = PrinterController.getInstance(mContext).getDeviceInfo();
-        if(info != null && info.getName() != null && info.getName().length() > 0) {
-            mName.setText(info.getName());
-            mWidth.setText(info.getWidth() + " px");
-            mHeight.setText(info.getHeight() + " px");
-            mDensity.setText(info.getDensity() + "");
-            mSpeed.setText(info.getSpeed() + "");
-            mSensorType.setText(info.getSensor());
+        mInfo = PrinterController.getInstance(mContext).getDeviceInfo();
+        if(mInfo != null && mInfo.getName() != null && mInfo.getName().length() > 0) {
+            updateDeviceInfo(mInfo);
         }
 
         PrinterController.getInstance(mContext).addOnConnectListener(getClass().getSimpleName(), new PrinterController.OnConnectListener() {
             @Override
             public void onConnect(boolean isSuccess) {
-                DeviceInfo info = PrinterController.getInstance(mContext).getDeviceInfo();
-                mName.setText(info.getName());
-                mWidth.setText(info.getWidth() + " px");
-                mHeight.setText(info.getHeight() + " px");
-                mDensity.setText(info.getDensity() + "");
-                mSpeed.setText(info.getSpeed() + "");
-                mSensorType.setText(info.getSensor());
+                updateDeviceInfo(PrinterController.getInstance(mContext).getDeviceInfo());
+
             }
         });
         return mView;
     }
 
+    private void updateDeviceInfo(DeviceInfo info){
+        mInfo = info;
+        mName.setText(mInfo.getName());
+        try {
+            float dpi = Float.parseFloat(mInfo.getDpi());
+            mWidth.setText(String.format("%.2f", (Float.parseFloat(mInfo.getWidth())/ dpi)) + " in");
+            mHeight.setText(String.format("%.2f", (Float.parseFloat(mInfo.getHeight())/ dpi)) + " in");
+
+        }catch (Exception e){
+
+        }
+        mDensity.setText(mInfo.getDensity() + "");
+        mSpeed.setText(mInfo.getSpeed() + "");
+        mSensorType.setText(mInfo.getSensor());
+    }
+
     @OnClick({R.id.setting_speed_set, R.id.setting_media_size_set, R.id.setting_sensor_type_set, R.id.setting_density_set})
     public void onClick(View view){
+        final PrinterController controller = PrinterController.getInstance(mContext);
         switch (view.getId()){
             case R.id.setting_speed_set:
-                showSeekbarDialog("Speed", 4, PrefUtil.getIntegerPreference(mContext, Constant.Pref.PARAM_SPEED, Constant.ParamDefault.SPEED), new View.OnClickListener() {
+                int speed = Constant.ParamDefault.SPEED;
+                try {
+                    speed = (int)Float.parseFloat(mInfo.getSpeed());
+                }
+                catch (Exception e){
+                }
+                showSeekbarDialog("Speed", 4, speed, new View.OnClickListener() {
                     @Override
                     public void onClick(View v) {
-                        PrefUtil.setIntegerPreference(mContext, Constant.Pref.PARAM_SPEED, (Integer) v.getTag());
-                        PrinterController.getInstance(mContext).setup(new PrinterController.OnPrintCompletedListener() {
+                        int speed = (Integer) v.getTag();
+                        controller.setup(controller.getSetupSpeedCommand(speed), new PrinterController.OnPrintCompletedListener() {
                             @Override
                             public void onCompleted(boolean isSuccess, String message) {
                                 if(isSuccess) {
                                     ((BaseActivity)mContext).showProgress(null);
-                                    PrinterController.getInstance(mContext).addCommandQueue(PrinterController.COMMAND_SPEED);
+                                    controller.addCommandQueue(PrinterController.COMMAND_SPEED);
                                 }
                             }
                         });
@@ -93,16 +107,22 @@ public class SettingFragment extends BaseFragment {
 //            case R.id.setting_sensor_type_set:
 //                break;
             case R.id.setting_density_set:
-                showSeekbarDialog("Density", 15, PrefUtil.getIntegerPreference(mContext, Constant.Pref.PARAM_DENSITY, Constant.ParamDefault.DENSITY), new View.OnClickListener() {
+                int density = Constant.ParamDefault.DENSITY;
+                try {
+                    density = Integer.parseInt(mInfo.getDensity());
+                }
+                catch (Exception e){
+                }
+                showSeekbarDialog("Density", 15, density, new View.OnClickListener() {
                     @Override
                     public void onClick(View v) {
-                        PrefUtil.setIntegerPreference(mContext, Constant.Pref.PARAM_DENSITY, (Integer) v.getTag());
-                        PrinterController.getInstance(mContext).setup(new PrinterController.OnPrintCompletedListener() {
+                        int density = (Integer) v.getTag();
+                        controller.setup(controller.getSetupDensityCommand(density) , new PrinterController.OnPrintCompletedListener() {
                             @Override
                             public void onCompleted(boolean isSuccess, String message) {
                                 if(isSuccess) {
                                     ((BaseActivity)mContext).showProgress(null);
-                                    PrinterController.getInstance(mContext).addCommandQueue(PrinterController.COMMAND_DENSITY);
+                                    controller.addCommandQueue(PrinterController.COMMAND_DENSITY);
                                 }
                             }
                         });

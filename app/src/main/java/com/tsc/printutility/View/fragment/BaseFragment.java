@@ -5,7 +5,6 @@ import android.support.v4.app.Fragment;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.Toast;
 
 import com.tsc.printutility.Controller.PrinterController;
 import com.tsc.printutility.View.BaseActivity;
@@ -35,7 +34,6 @@ public class BaseFragment extends Fragment {
             @Override
             public void onCompleted(boolean isSuccess, String message) {
                 ((BaseActivity)mContext).dismissProgress();
-                Toast.makeText(mContext, message, Toast.LENGTH_LONG).show();
             }
         });
     }

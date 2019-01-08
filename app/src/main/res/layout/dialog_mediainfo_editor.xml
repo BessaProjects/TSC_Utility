@@ -103,12 +103,12 @@
                     <RadioButton
                         android:id="@+id/mediainfo_editor_type_gap"
                         style="@style/style_text_mediainfo_title"
-                        android:text="gap" />
+                        android:text="GAP" />
 
                     <RadioButton
                         android:id="@+id/mediainfo_editor_type_black"
                         style="@style/style_text_mediainfo_title"
-                        android:text="black" />
+                        android:text="BLACK" />
 
                 </LinearLayout>
             </LinearLayout>

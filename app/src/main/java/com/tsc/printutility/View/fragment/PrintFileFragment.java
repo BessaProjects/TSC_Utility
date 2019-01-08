@@ -90,7 +90,7 @@ public class PrintFileFragment extends BaseFragment {
                     startActivity(i);
                 }
                 else{
-                    Toast.makeText(mContext, "不支援列印此當按類型", Toast.LENGTH_LONG).show();
+                    Toast.makeText(mContext, getString(R.string.device_file_type_not_support), Toast.LENGTH_LONG).show();
                 }
             }
             else {
@@ -109,7 +109,7 @@ public class PrintFileFragment extends BaseFragment {
                     startActivity(i);
                 }
                 else{
-                    Toast.makeText(mContext, "不支援列印此當按類型", Toast.LENGTH_LONG).show();
+                    Toast.makeText(mContext, getString(R.string.device_file_type_not_support), Toast.LENGTH_LONG).show();
                 }
             }
         }

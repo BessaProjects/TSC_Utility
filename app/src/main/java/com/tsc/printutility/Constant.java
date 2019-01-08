@@ -12,12 +12,13 @@ public class Constant {
 
         public final static int SPEED = 4;
         public final static int DENSITY = 4;
+        public final static int SENSOR_TYPE = 0;
 
         public final static int BMP_WIDTH = 460;
         public final static int DPI = 200;
         public final static String[] DPI_LIST = new String[]{"200dpi", "300dpi", "600dpi"};
 
-        public final static String[] SENSOR_TYPE = new String[]{"GAP", "BLINE"};
+        public final static String[] SENSOR_TYPE_LIST = new String[]{"GAP", "BLINE"};
 
         public final static boolean IS_RESIZE = true;
 
@@ -57,6 +58,7 @@ public class Constant {
         public final static String PARAM_DPI = "PARAM_DPI";
         public final static String PARAM_SPEED = "PARAM_SPEED";
         public final static String PARAM_DENSITY = "PARAM_DENSITY";
+        public final static String PARAM_SENSOR_TYPE = "PARAM_SENSOR_TYPE";
 
         public final static String PARAM_BMP_WIDTH = "PARAM_BMP_WIDTH";
 
