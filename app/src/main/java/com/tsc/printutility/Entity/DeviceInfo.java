@@ -52,6 +52,14 @@ public class DeviceInfo {
     }
 
     public String getSensor() {
+        if(sensor != null){
+            if(sensor.toLowerCase().startsWith("gap"))
+                return "GAP";
+            else if(sensor.toLowerCase().startsWith("bline"))
+                return "Mark";
+            else
+                return "Cont.";
+        }
         return sensor;
     }
 

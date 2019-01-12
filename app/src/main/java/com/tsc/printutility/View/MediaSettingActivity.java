@@ -6,7 +6,6 @@ import android.graphics.Color;
 import android.graphics.drawable.ColorDrawable;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
-import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
@@ -34,7 +33,7 @@ import butterknife.BindView;
 import butterknife.ButterKnife;
 import butterknife.OnClick;
 
-public class MediaSettingActivity extends AppCompatActivity {
+public class MediaSettingActivity extends BaseActivity {
 
 	@BindView(R.id.setting_media_list)
 	RecyclerView mList;
@@ -70,26 +69,40 @@ public class MediaSettingActivity extends AppCompatActivity {
 		mAdapter.setOnItemClickListener(new View.OnClickListener() {
 			@Override
 			public void onClick(final View view) {
-				MediaInfo info = ((MediaInfo) view.getTag());
+				setupMedia(((MediaInfo) view.getTag()));
+			}
+		});
+	}
 
-				PrefUtil.setLongPreference(MediaSettingActivity.this, Constant.Pref.PARAM_MEDIA_ID, info.getId());
-				String command = mPrinterController.getSetupSizeCommand((int)info.getWidth(), (int)info.getHeight(), 0);
+	private void setupMedia(MediaInfo info){
+		showProgress(null);
+		PrefUtil.setLongPreference(MediaSettingActivity.this, Constant.Pref.PARAM_MEDIA_ID, info.getId());
+		int width = (int)info.getWidth();
+		int height = (int)info.getHeight();
 
-				if(info.getSensorType().equals(MediaInfo.SENSOR_TYPE_BLACK))
-					command = mPrinterController.getSetupSizeCommand((int)info.getWidth(), (int)info.getHeight(), 1);
+		if (info.getUnit() == MediaInfo.UNIT_IN) {
+			width = (int)(width *  25.4f);
+			height = (int)(height *  25.4f);
+		}
+		String command = mPrinterController.getSetupSizeCommand(width, height, 0);
 
-				mPrinterController.setup(command, new PrinterController.OnPrintCompletedListener() {
-					@Override
-					public void onCompleted(boolean isSuccess, String message) {
-						if(isSuccess) {
-							mIsMediaChanged = true;
-							Toast.makeText(MediaSettingActivity.this, R.string.media_size_setup_success, Toast.LENGTH_LONG).show();
-						}
-						else{
-							Toast.makeText(MediaSettingActivity.this, R.string.media_size_setup_failed, Toast.LENGTH_LONG).show();
-						}
-					}
-				});
+		if(info.getSensorType().equals(MediaInfo.SENSOR_TYPE_BLACK))
+			command = mPrinterController.getSetupSizeCommand(width, height, 1);
+
+		if(info.getSensorType().equals(MediaInfo.SENSOR_TYPE_CONTINUE))
+			command = mPrinterController.getSetupSizeCommand(width, height, 2);
+
+		mPrinterController.setup(command, new PrinterController.OnPrintCompletedListener() {
+			@Override
+			public void onCompleted(boolean isSuccess, String message) {
+				dismissProgress();
+				if(isSuccess) {
+					mIsMediaChanged = true;
+					Toast.makeText(MediaSettingActivity.this, R.string.media_size_setup_success, Toast.LENGTH_LONG).show();
+				}
+				else{
+					Toast.makeText(MediaSettingActivity.this, R.string.media_size_setup_failed, Toast.LENGTH_LONG).show();
+				}
 			}
 		});
 	}
@@ -177,6 +190,7 @@ public class MediaSettingActivity extends AppCompatActivity {
 		final RadioButton unitMm = view.findViewById(R.id.mediainfo_editor_unit_mm);
 		final RadioButton typeGap = view.findViewById(R.id.mediainfo_editor_type_gap);
 		final RadioButton typeBlack = view.findViewById(R.id.mediainfo_editor_type_black);
+		final RadioButton typeCont = view.findViewById(R.id.mediainfo_editor_type_continue);
 		view.setTag(mediaInfo);
 
 		if(mediaInfo != null){
@@ -197,10 +211,17 @@ public class MediaSettingActivity extends AppCompatActivity {
 			if(mediaInfo.getSensorType().equals(MediaInfo.SENSOR_TYPE_GAP)){
 				typeGap.setChecked(true);
 				typeBlack.setChecked(false);
+				typeCont.setChecked(false);
 			}
-			else{
+			else if(mediaInfo.getSensorType().equals(MediaInfo.SENSOR_TYPE_BLACK)){
 				typeGap.setChecked(false);
 				typeBlack.setChecked(true);
+				typeCont.setChecked(false);
+			}
+			else {
+				typeGap.setChecked(false);
+				typeBlack.setChecked(false);
+				typeCont.setChecked(true);
 			}
 		}
 
@@ -208,6 +229,7 @@ public class MediaSettingActivity extends AppCompatActivity {
 			@Override
 			public void onCheckedChanged(CompoundButton compoundButton, boolean b) {
 				if(b){
+					typeCont.setChecked(false);
 					typeBlack.setChecked(false);
 				}
 			}
@@ -217,6 +239,17 @@ public class MediaSettingActivity extends AppCompatActivity {
 			@Override
 			public void onCheckedChanged(CompoundButton compoundButton, boolean b) {
 				if(b){
+					typeCont.setChecked(false);
+					typeGap.setChecked(false);
+				}
+			}
+		});
+
+		typeCont.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
+			@Override
+			public void onCheckedChanged(CompoundButton compoundButton, boolean b) {
+				if(b){
+					typeBlack.setChecked(false);
 					typeGap.setChecked(false);
 				}
 			}
@@ -267,8 +300,10 @@ public class MediaSettingActivity extends AppCompatActivity {
 
 				if(typeGap.isChecked())
 					info.setSensorType(MediaInfo.SENSOR_TYPE_GAP);
-				else
+				else if(typeBlack.isChecked())
 					info.setSensorType(MediaInfo.SENSOR_TYPE_BLACK);
+				else
+					info.setSensorType(MediaInfo.SENSOR_TYPE_CONTINUE);
 
 				info.setUpdateTime(getDateTime(System.currentTimeMillis()));
 				if(unitMm.isChecked())
@@ -280,6 +315,8 @@ public class MediaSettingActivity extends AppCompatActivity {
 					mMediaInfoController.insert(info);
 				else
 					mMediaInfoController.update(info);
+
+				setupMedia(info);
 				listener.onDismiss(null);
 				dialog.dismiss();
 			}

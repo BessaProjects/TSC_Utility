@@ -85,15 +85,21 @@
 
             </LinearLayout>
 
+            <TextView
+                style="@style/style_text_mediainfo_title"
+                android:layout_width="match_parent"
+                android:layout_gravity="center"
+                android:gravity="center"
+                android:layout_marginTop="10dp"
+                android:text="Sensor Type" />
+
+
             <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="10dp"
                 android:orientation="horizontal">
 
-                <TextView
-                    style="@style/style_text_mediainfo_title"
-                    android:text="Sensor Type" />
 
                 <LinearLayout
                     style="@style/style_edittext_mediainfo_title"
@@ -108,20 +114,29 @@
                     <RadioButton
                         android:id="@+id/mediainfo_editor_type_black"
                         style="@style/style_text_mediainfo_title"
-                        android:text="BLACK" />
+                        android:text="Mark" />
+
+                    <RadioButton
+                        android:id="@+id/mediainfo_editor_type_continue"
+                        style="@style/style_text_mediainfo_title"
+                        android:text="Cont." />
 
                 </LinearLayout>
             </LinearLayout>
+
+            <TextView
+                style="@style/style_text_mediainfo_title"
+                android:layout_width="match_parent"
+                android:layout_gravity="center"
+                android:gravity="center"
+                android:layout_marginTop="10dp"
+                android:text="Unit" />
 
             <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="10dp"
                 android:orientation="horizontal">
-
-                <TextView
-                    style="@style/style_text_mediainfo_title"
-                    android:text="Unit" />
 
                 <LinearLayout
                     style="@style/style_edittext_mediainfo_title"

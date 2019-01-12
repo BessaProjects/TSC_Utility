@@ -7,6 +7,8 @@ public class MediaInfo {
 
     public final static String SENSOR_TYPE_GAP = "gap";
     public final static String SENSOR_TYPE_BLACK = "black";
+    public final static String SENSOR_TYPE_CONTINUE = "continue";
+
     long id;
     String name;
     double width;
