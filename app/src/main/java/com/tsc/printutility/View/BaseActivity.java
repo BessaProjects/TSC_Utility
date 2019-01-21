@@ -383,7 +383,8 @@ public class BaseActivity extends AppCompatActivity {
     @Override
     public void onDestroy(){
         dismissProgress();
-        PrinterController.getInstance(this).closeport();
+        if(getClass().getSimpleName().equals(MainActivity.class.getSimpleName()))
+            PrinterController.getInstance(this).closeport();
         super.onDestroy();
     }
 

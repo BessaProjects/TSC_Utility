@@ -93,6 +93,10 @@
                 android:layout_marginTop="10dp"
                 android:text="Sensor Type" />
 
+            <View
+                android:layout_width="match_parent"
+                android:layout_height="1dp"
+                android:background="@android:color/darker_gray"/>
 
             <LinearLayout
                 android:layout_width="match_parent"
@@ -131,6 +135,11 @@
                 android:gravity="center"
                 android:layout_marginTop="10dp"
                 android:text="Unit" />
+
+            <View
+                android:layout_width="match_parent"
+                android:layout_height="1dp"
+                android:background="@android:color/darker_gray"/>
 
             <LinearLayout
                 android:layout_width="match_parent"
